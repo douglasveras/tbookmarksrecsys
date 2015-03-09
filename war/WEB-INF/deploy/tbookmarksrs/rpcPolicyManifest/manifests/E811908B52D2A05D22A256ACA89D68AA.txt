@@ -1,0 +1,2 @@
+serviceClass: br.cin.tbookmarks.client.UserWebResourcesService
+path: 913D9D8107074446AD1DA6FCC2A0E074.gwt.rpc
