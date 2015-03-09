@@ -1,2 +1,3 @@
 # Module tbookmarksrs
 # RPC service class, partial path of RPC policy file
+br.cin.tbookmarks.client.UserWebResourcesService, 913D9D8107074446AD1DA6FCC2A0E074.gwt.rpc
