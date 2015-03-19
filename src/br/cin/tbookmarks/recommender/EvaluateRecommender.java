@@ -1,51 +1,82 @@
 package br.cin.tbookmarks.recommender;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.eval.IRStatistics;
 import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
 import org.apache.mahout.cf.taste.eval.RecommenderEvaluator;
+import org.apache.mahout.cf.taste.eval.RecommenderIRStatsEvaluator;
 import org.apache.mahout.cf.taste.impl.eval.AverageAbsoluteDifferenceRecommenderEvaluator;
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
+import org.apache.mahout.cf.taste.impl.eval.GenericRecommenderIRStatsEvaluator;
+import org.apache.mahout.cf.taste.impl.eval.RMSRecommenderEvaluator;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
-import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+import org.apache.mahout.common.RandomUtils;
+
+import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 
 
 public class EvaluateRecommender {
-	private class MyRecommenderBuilder implements RecommenderBuilder{
-
-		@Override
-		public Recommender buildRecommender(DataModel dataModel)
-				throws TasteException {
-			UserSimilarity similarity = new PearsonCorrelationSimilarity(dataModel);
-			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, dataModel);
-			return new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
-		}
-		
+	
+	
+	private DataModel model;
+	private double trainingPercentage = 0.99;
+	private double datasetPercentage = 0.2;
+	private int top_n = 10;
+	private boolean enableFixedTestSeed = true;
+	
+	public EvaluateRecommender() {
+		model = GroupLensDataset.getInstance().getModel();
 	}
+	
+	private void evaluateRecommender(ArrayList<RecommenderBuilder> recommenders, RecommenderEvaluator evaluator) throws TasteException{
+		for (RecommenderBuilder recommenderBuilder : recommenders) {
+			if(enableFixedTestSeed){
+				RandomUtils.useTestSeed();
+			}
+			double result = evaluator.evaluate(recommenderBuilder, null, model, this.trainingPercentage, this.datasetPercentage);
+			System.out.println(recommenderBuilder.getClass().getSimpleName().toString()+": "+result);
+		}		
+	}
+	
+	private void evaluateRecommenderIRStats(ArrayList<RecommenderBuilder> recommenders, RecommenderIRStatsEvaluator evaluator) throws TasteException{
+		for (RecommenderBuilder recommenderBuilder : recommenders) {
+			if(enableFixedTestSeed){
+				RandomUtils.useTestSeed();
+			}	
+			IRStatistics result = evaluator.evaluate(
+					recommenderBuilder, null, model, null, this.top_n,
+					GenericRecommenderIRStatsEvaluator.CHOOSE_THRESHOLD,
+					this.datasetPercentage);
+			System.out.println(recommenderBuilder.getClass().getSimpleName().toString()+" Precision: "+result.getPrecision());
+			System.out.println(recommenderBuilder.getClass().getSimpleName().toString()+" Recall: "+result.getRecall());
+		}		
+	}
+	
 	public static void main(String[] args) {
-		RecommenderEvaluator evaluator = new AverageAbsoluteDifferenceRecommenderEvaluator();
-		EvaluateRecommender er = new EvaluateRecommender();
-		RecommenderBuilder builder = er.new MyRecommenderBuilder();
-		DataModel model;
-		try {
-			model = new FileDataModel(new File(System.getProperty("user.dir")+"\\resources\\dataset.csv"));
-			double result = evaluator.evaluate(builder, null, model, 0.9, 1.0);
-			System.out.println(result);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TasteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
+		try {
+					
+			EvaluateRecommender er = new EvaluateRecommender();
+						
+			Recommenders recommenders = new Recommenders();
+			
+			System.out.println("\nAverageAbsoluteDifferenceRecommenderEvaluator>>>>>>>>>>>>>>>");
+			RecommenderEvaluator evaluator = new AverageAbsoluteDifferenceRecommenderEvaluator();
+			er.evaluateRecommender(recommenders.getRecommenderBuilders(), evaluator);
+			
+			System.out.println("\nRMSRecommenderEvaluator>>>>>>>>>>>>>>>");
+			RecommenderEvaluator rmse = new RMSRecommenderEvaluator();
+			er.evaluateRecommender(recommenders.getRecommenderBuilders(), rmse);
+			
+			System.out.println("\nGenericRecommenderIRStatsEvaluator>>>>>>>>>>>>>>>");
+			RecommenderIRStatsEvaluator precisionRecall = new GenericRecommenderIRStatsEvaluator();
+			er.evaluateRecommenderIRStats(recommenders.getRecommenderBuilders(), precisionRecall);
+			
+		}catch (TasteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		
 	}
 }

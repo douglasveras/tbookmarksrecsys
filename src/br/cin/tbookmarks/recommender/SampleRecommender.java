@@ -1,101 +1,90 @@
 package br.cin.tbookmarks.recommender;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
-import org.apache.mahout.cf.taste.impl.recommender.CachingRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
+import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
-import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
-import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+
+import br.cin.tbookmarks.recommender.database.AbstractDataset;
+import br.cin.tbookmarks.recommender.database.GroupLensDataset;
+import br.cin.tbookmarks.recommender.database.ItemCategory;
+import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
 
 public class SampleRecommender {
 
 	private DataModel model;
+	private List<RecommendedItem> recommendedItems;
+	private AbstractDataset absDataset = GroupLensDataset.getInstance();
+
+	private Recommenders recommenders;
+	private int maxOfRecommendedItems = 3;
 
 	public SampleRecommender() {
-		try {
-			model = new FileDataModel(new File(System.getProperty("user.dir")
-					+ "\\resources\\dataset.csv"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void userBasedTreshold(double threshold) throws TasteException {
-
-		UserSimilarity similarity = new PearsonCorrelationSimilarity(model);
-		UserNeighborhood neighborhood = new ThresholdUserNeighborhood(threshold,
-				similarity, model);
-		UserBasedRecommender recommender = new GenericUserBasedRecommender(
-				model, neighborhood, similarity);
-
-		List<RecommendedItem> recommendations = recommender.recommend(2, 3);
-		for (RecommendedItem recommendation : recommendations) {
-			System.out.println(recommendation);
-		}
+		this.model = absDataset.getModel();
+		this.recommendedItems = new ArrayList<RecommendedItem>();
+		this.recommenders = new Recommenders();
 
 	}
 
-	private void userBasedNearestNeighbor() throws TasteException {
-
-		UserSimilarity similarity = new PearsonCorrelationSimilarity(model);
-		UserNeighborhood neighborhood = new NearestNUserNeighborhood(3,
-				similarity, model);
-		Recommender recommender = new GenericUserBasedRecommender(model,
-				neighborhood, similarity);
-		Recommender cachingRecommender = new CachingRecommender(recommender);
-
-		List<RecommendedItem> recommendations = cachingRecommender.recommend(2,
-				3);
-		for (RecommendedItem recommendation : recommendations) {
-			System.out.println(recommendation);
-		}
-
+	public DataModel getModel() {
+		return model;
 	}
-	
-	private void itemBasedPearson() throws TasteException {
 
-		ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
-		Recommender recommender = new GenericItemBasedRecommender(model, similarity);
-		Recommender cachingRecommender = new CachingRecommender(recommender);
-
-		List<RecommendedItem> recommendations = cachingRecommender.recommend(2,
-				3);
-		for (RecommendedItem recommendation : recommendations) {
-			System.out.println(recommendation);
-		}
-
+	public void setModel(DataModel model) {
+		this.model = model;
 	}
-	
+
+	public List<RecommendedItem> getRecommendedItems() {
+		return recommendedItems;
+	}
+
+	public void setRecommendedItems(List<RecommendedItem> recommendedItems) {
+		this.recommendedItems = recommendedItems;
+	}
+
+	public void recommendByAlgorithm(long userId, int numberOfRecommendations,
+			RecommenderBuilder rb) throws TasteException {
+		
+		/*ItemCategoryRescorer icr = new ItemCategoryRescorer(ItemCategory.MUSICAL,null, absDataset);
+		
+		this.recommendedItems = rb.buildRecommender(this.model).recommend(
+				userId, numberOfRecommendations,icr);*/
+		this.recommendedItems = rb.buildRecommender(this.model).recommend(
+				userId, numberOfRecommendations);
+	}
+
+	private void printInfoRecommendations() {
+		int position = 1;
+		for (RecommendedItem recommendation : this.recommendedItems) {
+			System.out.println(position + ": " + recommendation.getItemID()
+					+ " - "
+					+ absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getName()
+					+ " - " + recommendation.getValue()
+					+ " - " + absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getCategories());
+			position++;
+		}
+	}
+
 	public static void main(String[] args) {
 		SampleRecommender sr = new SampleRecommender();
 
+		ArrayList<RecommenderBuilder> list = sr.recommenders
+				.getRecommenderBuilders();
+
 		try {
-			/*System.out.println("userBasedNearestNeighbor>>>>>>>>>>>>>>>\n");
-			sr.userBasedNearestNeighbor();
-			System.out.println("userBasedTreshold>>>>>>>>>>>>>>>\n");
-			sr.userBasedTreshold(0.3);
-			System.out.println("itemBasedPearson>>>>>>>>>>>>>>>\n");
-			sr.itemBasedPearson();*/
-			
-			for(double t = 0.1;t<1.0;t=t+0.1){
-				System.out.println("userBasedTreshold>>>>>>"+t+">>>>>>>>\n");
-				sr.userBasedTreshold(t);
-				System.out.println("\n");
+			int userId = 2;
+
+			for (RecommenderBuilder recommenderBuilder : list) {
+				System.out.println("\n"+recommenderBuilder.getClass()
+						.getSimpleName() + ">>>>>>>>>>>>>>>");
+				sr.recommendByAlgorithm(userId, sr.maxOfRecommendedItems,
+						recommenderBuilder);
+				sr.printInfoRecommendations();
 			}
+
 		} catch (TasteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
