@@ -6,26 +6,38 @@ import java.util.List;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
 import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
+import br.cin.tbookmarks.recommender.database.BookCrossingDataset;
+import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
+import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
 import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.ItemCategory;
+import br.cin.tbookmarks.recommender.database.ItemDomain;
+import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
+import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
 import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
+import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
 
 public class SampleRecommender {
 
 	private DataModel model;
 	private List<RecommendedItem> recommendedItems;
-	private AbstractDataset absDataset = GroupLensDataset.getInstance();
-
+	private AbstractDataset absDataset;
+	private IDRescorer idrescorer;
+	
 	private Recommenders recommenders;
-	private int maxOfRecommendedItems = 3;
+	private int maxOfRecommendedItems = 5;
 
-	public SampleRecommender() {
-		this.model = absDataset.getModel();
+	public SampleRecommender(AbstractDataset absDataset, IDRescorer idrescorer) {
+		this.absDataset = absDataset;
+		this.model = this.absDataset.getModel();
 		this.recommendedItems = new ArrayList<RecommendedItem>();
-		this.recommenders = new Recommenders();
+		this.recommenders = new Recommenders(this.absDataset);
+
+		this.idrescorer = idrescorer;
 
 	}
 
@@ -48,12 +60,9 @@ public class SampleRecommender {
 	public void recommendByAlgorithm(long userId, int numberOfRecommendations,
 			RecommenderBuilder rb) throws TasteException {
 		
-		/*ItemCategoryRescorer icr = new ItemCategoryRescorer(ItemCategory.MUSICAL,null, absDataset);
-		
 		this.recommendedItems = rb.buildRecommender(this.model).recommend(
-				userId, numberOfRecommendations,icr);*/
-		this.recommendedItems = rb.buildRecommender(this.model).recommend(
-				userId, numberOfRecommendations);
+				userId, numberOfRecommendations,this.idrescorer);
+
 	}
 
 	private void printInfoRecommendations() {
@@ -63,19 +72,25 @@ public class SampleRecommender {
 					+ " - "
 					+ absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getName()
 					+ " - " + recommendation.getValue()
-					+ " - " + absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getCategories());
+					+ " - " + absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getCategories()
+					+ " - " + absDataset.getRecommendedItemInformationByID(recommendation.getItemID()).getItemDomain());
 			position++;
 		}
 	}
 
 	public static void main(String[] args) {
-		SampleRecommender sr = new SampleRecommender();
+		
+		AbstractDataset absDataset = MoviesCrossBooksDataset.getInstance();
+		
+		IDRescorer idrescorer = new ItemDomainRescorer(null,ItemDomain.MOVIE, absDataset);
+		
+		SampleRecommender sr = new SampleRecommender(absDataset, idrescorer);
 
 		ArrayList<RecommenderBuilder> list = sr.recommenders
 				.getRecommenderBuilders();
 
 		try {
-			int userId = 2;
+			int userId = 6041; //6041
 
 			for (RecommenderBuilder recommenderBuilder : list) {
 				System.out.println("\n"+recommenderBuilder.getClass()
@@ -84,6 +99,7 @@ public class SampleRecommender {
 						recommenderBuilder);
 				sr.printInfoRecommendations();
 			}
+			System.out.println("FINISHED!!");
 
 		} catch (TasteException e) {
 			// TODO Auto-generated catch block

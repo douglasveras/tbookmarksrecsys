@@ -9,6 +9,7 @@ public class ItemInformation {
 	private String yearReleased;
 	private String link;
 	private Set<ItemCategory> categories;
+	private ItemDomain itemDomain;
 	
 	public long getId() {
 		return id;
@@ -43,5 +44,12 @@ public class ItemInformation {
 		return categories;
 	}
 	
+	public void setItemDomain(ItemDomain itemDomain) {
+		this.itemDomain = itemDomain;
+	}
+	
+	public ItemDomain getItemDomain() {
+		return itemDomain;
+	}
 
 }

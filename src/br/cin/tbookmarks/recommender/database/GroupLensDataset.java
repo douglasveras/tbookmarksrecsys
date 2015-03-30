@@ -86,6 +86,8 @@ public final class GroupLensDataset extends AbstractDataset {
 			itemInfo.setCategories(itemCategories);
 			// itemInfo.setYearReleased(row[index++]);
 			// itemInfo.setLink(row[index++]);
+			
+			itemInfo.setItemDomain(ItemDomain.MOVIE);
 
 			itemDatasetInformation.getItens().add(itemInfo);
 			countItemInformation++;
