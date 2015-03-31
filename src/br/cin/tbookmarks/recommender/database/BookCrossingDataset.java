@@ -27,7 +27,6 @@ public final class BookCrossingDataset extends AbstractDataset {
 	private static final BookCrossingDataset INSTANCE = new BookCrossingDataset();
 
 	private String datasetURLOriginal = "\\resources\\datasets\\book_crossing\\BX-Book-Ratings.csv";
-	private String datasetURL = "\\resources\\datasets\\book_crossing\\BX-Book-Ratings_new.dat";
 	private String datasetInformationURL = "\\resources\\datasets\\book_crossing\\BX-Books.csv";
 	private String datasetInformationDelimiter = ";";
 	private String timestampFormat = "YYYY-MM-DD hh:mm:ss";
@@ -36,6 +35,7 @@ public final class BookCrossingDataset extends AbstractDataset {
 	{
 		implicitExplicitMapping = new HashMap<String, String>();
 		implicitExplicitMapping.put("0", "2.5");
+		datasetURL = "\\resources\\datasets\\book_crossing\\BX-Book-Ratings_new.dat";
 		//implicitExplicitMapping.put("Yes", "4.0");
 	}
 
@@ -175,11 +175,6 @@ public final class BookCrossingDataset extends AbstractDataset {
 					.replace(matcher.group(), auxReplace);
 		}
 		return replaced;
-	}
-
-	private void initializeDataModel() throws IOException {
-		model = new FileDataModel(new File(System.getProperty("user.dir")
-				+ datasetURL));
 	}
 
 	private void initializeDBInfo() throws NumberFormatException, IOException {

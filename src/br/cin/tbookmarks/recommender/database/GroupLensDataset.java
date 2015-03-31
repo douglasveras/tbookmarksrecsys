@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Set;
 
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -15,14 +14,9 @@ public final class GroupLensDataset extends AbstractDataset {
 
 	private static final GroupLensDataset INSTANCE = new GroupLensDataset();
 
-	/*
-	 * public static String datasetURL =
-	 * "\\resources\\datasets\\groupLens\\100K\\ua.base"; public static String
-	 * datasetInformationURL = "\\resources\\datasets\\groupLens\\100K\\u.item";
-	 * public static String datasetInformationDelimiter = "\\|";
-	 */
-
-	private String datasetURL = "\\resources\\datasets\\groupLens\\1M\\ratings.dat";
+	{
+		datasetURL = "\\resources\\datasets\\groupLens\\1M\\ratings.dat";
+	}
 	private String datasetInformationURL = "\\resources\\datasets\\groupLens\\1M\\movies.dat";
 	private String datasetInformationDelimiter = ";";
 
@@ -42,11 +36,6 @@ public final class GroupLensDataset extends AbstractDataset {
 
 	public static GroupLensDataset getInstance() {
 		return INSTANCE;
-	}
-
-	private void initializeDataModel() throws IOException {
-		model = new FileDataModel(new File(System.getProperty("user.dir")
-				+ datasetURL));
 	}
 
 	private void initializeDBInfo() throws NumberFormatException, IOException {
@@ -80,13 +69,14 @@ public final class GroupLensDataset extends AbstractDataset {
 			Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
 
 			for (int i = 0; i < categories.length; i++) {
-				itemCategories.add(ItemCategory.convertToItem(categories[i].toUpperCase()));
+				itemCategories.add(ItemCategory.convertToItem(categories[i]
+						.toUpperCase()));
 			}
 
 			itemInfo.setCategories(itemCategories);
 			// itemInfo.setYearReleased(row[index++]);
 			// itemInfo.setLink(row[index++]);
-			
+
 			itemInfo.setItemDomain(ItemDomain.MOVIE);
 
 			itemDatasetInformation.getItens().add(itemInfo);

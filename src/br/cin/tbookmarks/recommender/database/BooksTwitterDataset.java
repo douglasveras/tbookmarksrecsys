@@ -35,16 +35,19 @@ public final class BooksTwitterDataset extends AbstractDataset {
 	 */
 
 	private String datasetURLOriginal = "\\resources\\datasets\\twitter\\books\\books_ratings.dat";
-	private String datasetURL = "\\resources\\datasets\\twitter\\books\\books_ratings_new.dat";
+	{
+		datasetURL = "\\resources\\datasets\\twitter\\books\\books_ratings_new.dat";
+	}
 	private String datasetInformationURL = "\\resources\\datasets\\twitter\\books\\books.dat";
 	private String datasetInformationDelimiter = "::";
 	private boolean haveHeader = false;
-	/*private HashMap<String, String> implicitExplicitMapping;
-	{
-		implicitExplicitMapping = new HashMap<String, String>();
-		implicitExplicitMapping.put("Maybe", "2.5");
-		implicitExplicitMapping.put("Yes", "4.0");
-	}*/
+
+	/*
+	 * private HashMap<String, String> implicitExplicitMapping; {
+	 * implicitExplicitMapping = new HashMap<String, String>();
+	 * implicitExplicitMapping.put("Maybe", "2.5");
+	 * implicitExplicitMapping.put("Yes", "4.0"); }
+	 */
 
 	private BooksTwitterDataset() {
 		try {
@@ -70,8 +73,9 @@ public final class BooksTwitterDataset extends AbstractDataset {
 		File fileEN = new File(System.getProperty("user.dir")
 				+ datasetURLOriginal);
 		File fileOutput = new File(System.getProperty("user.dir") + datasetURL);
-		
-		File fileOutputInformation = new File(System.getProperty("user.dir") + datasetInformationURL);
+
+		File fileOutputInformation = new File(System.getProperty("user.dir")
+				+ datasetInformationURL);
 
 		if (!fileOutput.exists() && !fileOutputInformation.exists()) {
 
@@ -90,8 +94,9 @@ public final class BooksTwitterDataset extends AbstractDataset {
 						streamOutput);
 
 				BufferedWriter bw = new BufferedWriter(streamWriter);
-				
-				FileOutputStream streamOutputInfo = new FileOutputStream(fileOutputInformation);
+
+				FileOutputStream streamOutputInfo = new FileOutputStream(
+						fileOutputInformation);
 
 				OutputStreamWriter streamWriterInfo = new OutputStreamWriter(
 						streamOutputInfo);
@@ -110,19 +115,18 @@ public final class BooksTwitterDataset extends AbstractDataset {
 					line = reader.readLine();// pula primeira linha - cabecalho
 				}
 
-				
-
 				while ((line = reader.readLine()) != null) {
 
 					String replaced = removeCommaInField(line);
 					// System.out.println(replaced);
 
-					String[] aux = replaced.split(this.datasetInformationDelimiter);
-					
+					String[] aux = replaced
+							.split(this.datasetInformationDelimiter);
+
 					String itemIdText = aux[2];
-					if(itemIdText.contains("-")){
+					if (itemIdText.contains("-")) {
 						itemIdText = itemIdText.split("-")[0];
-					}else if(itemIdText.contains(".")){
+					} else if (itemIdText.contains(".")) {
 						itemIdText = itemIdText.split("\\.")[0];
 					}
 					if (!itemIdMaps.keySet().contains(itemIdText)) {
@@ -132,14 +136,13 @@ public final class BooksTwitterDataset extends AbstractDataset {
 					} else {
 						itemIdText = String.valueOf(itemIdMaps.get(itemIdText));
 					}
-					
-					
+
 					String timeStamp = aux[5];
-					
+
 					String rating = aux[4];
-										
+
 					String userIdText = "";
-					
+
 					if (!idMaps.keySet().contains(aux[0])) {
 						idMaps.put(aux[0], userId);
 						userIdText = String.valueOf(userId);
@@ -147,27 +150,23 @@ public final class BooksTwitterDataset extends AbstractDataset {
 					} else {
 						userIdText = String.valueOf(idMaps.get(aux[0]));
 					}
-					
-					bw.append(userIdText + "\t" + itemIdText + "\t" + rating + "\t"
-							+ timeStamp);
+
+					bw.append(userIdText + "\t" + itemIdText + "\t" + rating
+							+ "\t" + timeStamp);
 					bw.newLine();
-					
-					if(!itemIdInformation.contains(itemIdText)){
-						bwInfo.append(itemIdText+"::"+aux[3]);
+
+					if (!itemIdInformation.contains(itemIdText)) {
+						bwInfo.append(itemIdText + "::" + aux[3]);
 						bwInfo.newLine();
 						itemIdInformation.add(itemIdText);
 					}
-					
-					
-					
-					
 
 				}
 
 				reader.close();
 				streamReader.close();
-				//streamOutput.close();
-				//streamOutputInfo.close();
+				// streamOutput.close();
+				// streamOutputInfo.close();
 				bw.close();
 				bwInfo.close();
 
@@ -189,26 +188,20 @@ public final class BooksTwitterDataset extends AbstractDataset {
 	}
 
 	private String removeCommaInField(String line) {
-		
+
 		String regex = "\".*?\"";
 
 		Pattern pattern = Pattern.compile(regex);
-		
+
 		Matcher matcher = pattern.matcher(line);
 
 		String replaced = line;
 
 		while (matcher.find()) {
 			String auxReplace = matcher.group().replaceAll(",", "");
-			replaced = replaced
-					.replace(matcher.group(), auxReplace);
+			replaced = replaced.replace(matcher.group(), auxReplace);
 		}
 		return replaced;
-	}
-
-	private void initializeDataModel() throws IOException {
-		model = new FileDataModel(new File(System.getProperty("user.dir")
-				+ datasetURL));
 	}
 
 	private void initializeDBInfo() throws NumberFormatException, IOException {
@@ -230,37 +223,39 @@ public final class BooksTwitterDataset extends AbstractDataset {
 
 		ItemInformation itemInfo;
 
-		if(haveHeader){
+		if (haveHeader) {
 			line = reader.readLine();
 		}
-		
+
 		while ((line = reader.readLine()) != null) {
 			itemInfo = new ItemInformation();
-			
+
 			String replaced = removeCommaInField(line);
 			// System.out.println(replaced);
-			
+
 			String row[] = replaced.split(datasetInformationDelimiter);
-			/*String itemId = row[0].replace("/", "");
-			
-			if(itemId.contains("-")){
-				itemId = itemId.split("-")[0];
-			}*/
-			
+			/*
+			 * String itemId = row[0].replace("/", "");
+			 * 
+			 * if(itemId.contains("-")){ itemId = itemId.split("-")[0]; }
+			 */
+
 			itemInfo.setId(Long.parseLong(row[0]));
-			
+
 			itemInfo.setName(row[1]);
-			//String categories[] = row[index].split("\\|");
+			// String categories[] = row[index].split("\\|");
 
-			//TODO: Get categories online
-			/*Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
-			itemCategories.add(ItemCategory.MUSICAL);
-						
-
-			itemInfo.setCategories(itemCategories);*/
+			// TODO: Get categories online
+			/*
+			 * Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
+			 * itemCategories.add(ItemCategory.MUSICAL);
+			 * 
+			 * 
+			 * itemInfo.setCategories(itemCategories);
+			 */
 			// itemInfo.setYearReleased(row[index++]);
 			// itemInfo.setLink(row[index++]);
-			
+
 			itemInfo.setItemDomain(ItemDomain.BOOK);
 
 			itemDatasetInformation.getItens().add(itemInfo);

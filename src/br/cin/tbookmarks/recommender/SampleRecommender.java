@@ -17,6 +17,7 @@ import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.ItemCategory;
 import br.cin.tbookmarks.recommender.database.ItemDomain;
 import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
+import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
 import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
 import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
@@ -80,9 +81,13 @@ public class SampleRecommender {
 
 	public static void main(String[] args) {
 		
-		AbstractDataset absDataset = MoviesCrossBooksDataset.getInstance();
+		AbstractDataset absDataset = MoviesCrossEventsBooksDataset.getInstance();
 		
-		IDRescorer idrescorer = new ItemDomainRescorer(null,ItemDomain.MOVIE, absDataset);
+		ArrayList<ItemDomain> domainsFilter = new ArrayList<ItemDomain>();
+		domainsFilter.add(ItemDomain.MOVIE);
+		domainsFilter.add(ItemDomain.BOOK);
+		
+		IDRescorer idrescorer = new ItemDomainRescorer(null,domainsFilter, absDataset);
 		
 		SampleRecommender sr = new SampleRecommender(absDataset, idrescorer);
 

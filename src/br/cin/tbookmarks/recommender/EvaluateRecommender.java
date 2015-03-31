@@ -1,5 +1,7 @@
 package br.cin.tbookmarks.recommender;
 
+import java.util.ArrayList;
+
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.eval.IRStatistics;
 import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
@@ -18,6 +20,7 @@ import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
 import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.ItemDomain;
 import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
+import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
 import br.cin.tbookmarks.recommender.evaluation.AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain;
 import br.cin.tbookmarks.recommender.evaluation.RMSRecommenderEvaluatorCrossDomain;
@@ -72,9 +75,13 @@ public class EvaluateRecommender {
 		
 		try {
 					
-			AbstractDataset dataset = MoviesCrossBooksDataset.getInstance();
+			AbstractDataset dataset = MoviesCrossEventsBooksDataset.getInstance();
 			
-			IDRescorer idrescorer = new ItemDomainRescorer(null,ItemDomain.MOVIE, dataset);
+			ArrayList<ItemDomain> domainsFilter = new ArrayList<ItemDomain>();
+			domainsFilter.add(ItemDomain.MOVIE);
+			domainsFilter.add(ItemDomain.BOOK);
+			
+			IDRescorer idrescorer = new ItemDomainRescorer(null,domainsFilter, dataset);
 			//IDRescorer idrescorer = null;
 			
 			

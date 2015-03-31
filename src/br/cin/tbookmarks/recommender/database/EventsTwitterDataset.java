@@ -34,13 +34,13 @@ public final class EventsTwitterDataset extends AbstractDataset {
 	 */
 
 	private String datasetURLOriginal = "\\resources\\datasets\\twitter\\events\\events_ratings.dat";
-	private String datasetURL = "\\resources\\datasets\\twitter\\events\\events_ratings_new.dat";
 	private String datasetInformationURL = "\\resources\\datasets\\twitter\\events\\events.dat";
 	private String datasetInformationDelimiter = ",";
 	private String timestampFormat = "YYYY-MM-DD hh:mm:ss";
 	private boolean haveHeader = true;
 	private HashMap<String, String> implicitExplicitMapping;
 	{
+		datasetURL = "\\resources\\datasets\\twitter\\events\\events_ratings_new.dat";
 		implicitExplicitMapping = new HashMap<String, String>();
 		implicitExplicitMapping.put("Maybe", "2.5");
 		implicitExplicitMapping.put("Yes", "4.0");
@@ -182,11 +182,6 @@ public final class EventsTwitterDataset extends AbstractDataset {
 					.replace(matcher.group(), auxReplace);
 		}
 		return replaced;
-	}
-
-	private void initializeDataModel() throws IOException {
-		model = new FileDataModel(new File(System.getProperty("user.dir")
-				+ datasetURL));
 	}
 
 	private void initializeDBInfo() throws NumberFormatException, IOException {
