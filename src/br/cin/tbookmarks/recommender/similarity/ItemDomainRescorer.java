@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
-import br.cin.tbookmarks.recommender.database.ItemDomain;
-import br.cin.tbookmarks.recommender.database.ItemInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 
 public class ItemDomainRescorer implements IDRescorer {
 

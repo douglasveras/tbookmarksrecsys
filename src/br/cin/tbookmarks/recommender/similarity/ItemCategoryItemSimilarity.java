@@ -12,8 +12,8 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import com.google.common.primitives.Longs;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
-import br.cin.tbookmarks.recommender.database.ItemCategory;
-import br.cin.tbookmarks.recommender.database.ItemInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 
 public class ItemCategoryItemSimilarity implements ItemSimilarity {
 

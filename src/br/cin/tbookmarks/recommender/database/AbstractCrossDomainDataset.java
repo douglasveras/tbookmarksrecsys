@@ -3,6 +3,8 @@ package br.cin.tbookmarks.recommender.database;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
+
 
 public abstract class AbstractCrossDomainDataset extends AbstractDataset {
 	

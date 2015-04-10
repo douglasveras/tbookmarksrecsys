@@ -20,6 +20,11 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
+import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
+
 import com.google.gwt.dev.util.collect.HashSet;
 
 public final class BookCrossingDataset extends AbstractDataset {

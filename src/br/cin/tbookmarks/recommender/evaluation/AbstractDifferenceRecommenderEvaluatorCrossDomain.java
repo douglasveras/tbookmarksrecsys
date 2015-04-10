@@ -37,6 +37,11 @@ import org.apache.mahout.common.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.cin.tbookmarks.recommender.database.contextual.ContextualDataModel;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualFileDataModel;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualPreference;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualUserPreferenceArray;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -108,7 +113,10 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 		      }
 		    }
 		    
-		    DataModel trainingModel = dataModelBuilder == null ? new GenericDataModel(trainingPrefs)
+		    DataModel newDataModel = dataModel instanceof ContextualFileDataModel? new ContextualDataModel(trainingPrefs) : 
+		    																	new GenericDataModel(trainingPrefs);
+		    
+		    DataModel trainingModel = dataModelBuilder == null ? newDataModel
 		        : dataModelBuilder.buildDataModel(trainingPrefs);
 		    
 		    Recommender recommender = recommenderBuilder.buildRecommender(trainingModel);
@@ -157,8 +165,11 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	    List<Preference> oneUserTestPrefs = null;
 	    PreferenceArray prefs = dataModel.getPreferencesFromUser(userID);
 	    int size = prefs.length();
+	    boolean isInstanceOfContextualUserPreferenceArray = prefs instanceof ContextualUserPreferenceArray;
+	    
 	    for (int i = 0; i < size; i++) {
-	      Preference newPref = new GenericPreference(userID, prefs.getItemID(i), prefs.getValue(i));
+	      Preference newPref = isInstanceOfContextualUserPreferenceArray ? new ContextualPreference(userID, prefs.getItemID(i), prefs.getValue(i), ((ContextualUserPreferenceArray)prefs).getContextualPreferences(i))
+	    		  																: new GenericPreference(userID, prefs.getItemID(i), prefs.getValue(i));
 	      if (random.nextDouble() < trainingPercentage) {
 	        if (oneUserTrainingPrefs == null) {
 	          oneUserTrainingPrefs = Lists.newArrayListWithCapacity(3);
@@ -178,9 +189,11 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	      }
 	    }
 	    if (oneUserTrainingPrefs != null) {
-	      trainingPrefs.put(userID, new GenericUserPreferenceArray(oneUserTrainingPrefs));
+	      trainingPrefs.put(userID, isInstanceOfContextualUserPreferenceArray ? new ContextualUserPreferenceArray(oneUserTrainingPrefs) 
+	      																		: new GenericUserPreferenceArray(oneUserTrainingPrefs));
 	      if (oneUserTestPrefs != null) {
-	        testPrefs.put(userID, new GenericUserPreferenceArray(oneUserTestPrefs));
+	        testPrefs.put(userID, isInstanceOfContextualUserPreferenceArray ? new ContextualUserPreferenceArray(oneUserTestPrefs) 
+	        																	: new GenericUserPreferenceArray(oneUserTestPrefs));
 	      }
 	    }
 	  }

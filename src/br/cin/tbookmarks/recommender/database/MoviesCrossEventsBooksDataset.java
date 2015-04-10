@@ -5,7 +5,7 @@ public final class MoviesCrossEventsBooksDataset extends AbstractCrossDomainData
 	private static final MoviesCrossEventsBooksDataset INSTANCE = new MoviesCrossEventsBooksDataset();
 	
 	private MoviesCrossEventsBooksDataset() {
-		datasetURL = "\\resources\\datasets\\cross-domain\\movies_cross_events_books_test_user_without_events_books_rating.dat";
+		datasetURL = "\\resources\\datasets\\cross-domain\\contextual_movies_cross_events_books.dat";
 		datasets.add(GroupLensDataset.getInstance());
 		datasets.add(EventsTwitterDataset.getInstance());
 		datasets.add(BooksTwitterDataset.getInstance());

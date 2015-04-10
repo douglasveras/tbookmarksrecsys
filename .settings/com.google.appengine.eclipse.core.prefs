@@ -6,4 +6,4 @@ gaeHrdEnabled=true
 gaeLaunchAppInBrowser=true
 googleCloudSqlEnabled=false
 localDevMySqlEnabled=true
-validationExclusions=src/br/cin/tbookmarks/recommender/database/
+validationExclusions=src/br/cin/tbookmarks/recommender/database/|src/br/cin/tbookmarks/util/ContextualFileGenerator.java

@@ -11,7 +11,7 @@ import org.apache.mahout.cf.taste.model.PreferenceArray;
 import com.google.common.primitives.Longs;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
-import br.cin.tbookmarks.recommender.database.ItemInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 
 public class PreferredItemsContentFilteringCandidateItemsStrategy extends
 		AbstractCandidateItemsStrategy {

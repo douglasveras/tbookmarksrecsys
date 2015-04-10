@@ -8,12 +8,22 @@ import java.io.InputStreamReader;
 import java.util.Set;
 
 
+
+
+
+
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
+import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
+
 import com.google.gwt.dev.util.collect.HashSet;
 
 public final class GroupLensDataset extends AbstractDataset {
 
 	private static final GroupLensDataset INSTANCE = new GroupLensDataset();
-
+	private static final boolean initializeDM = false;
+	
 	{
 		datasetURL = "\\resources\\datasets\\groupLens\\1M\\ratings.dat";
 	}
@@ -22,7 +32,10 @@ public final class GroupLensDataset extends AbstractDataset {
 
 	private GroupLensDataset() {
 		try {
-			initializeDataModel();
+			if(initializeDM){
+				initializeDataModel();	
+			}
+			
 			initializeDBInfo();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -37,6 +50,7 @@ public final class GroupLensDataset extends AbstractDataset {
 	public static GroupLensDataset getInstance() {
 		return INSTANCE;
 	}
+
 
 	private void initializeDBInfo() throws NumberFormatException, IOException {
 

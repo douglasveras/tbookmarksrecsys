@@ -14,11 +14,11 @@ import br.cin.tbookmarks.recommender.database.BookCrossingDataset;
 import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
 import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
 import br.cin.tbookmarks.recommender.database.GroupLensDataset;
-import br.cin.tbookmarks.recommender.database.ItemCategory;
-import br.cin.tbookmarks.recommender.database.ItemDomain;
 import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
 import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
 
@@ -85,7 +85,7 @@ public class SampleRecommender {
 		
 		ArrayList<ItemDomain> domainsFilter = new ArrayList<ItemDomain>();
 		domainsFilter.add(ItemDomain.MOVIE);
-		domainsFilter.add(ItemDomain.BOOK);
+		domainsFilter.add(ItemDomain.EVENT);
 		
 		IDRescorer idrescorer = new ItemDomainRescorer(null,domainsFilter, absDataset);
 		
@@ -95,7 +95,7 @@ public class SampleRecommender {
 				.getRecommenderBuilders();
 
 		try {
-			int userId = 6041; //6041
+			int userId = 6040; //6041
 
 			for (RecommenderBuilder recommenderBuilder : list) {
 				System.out.println("\n"+recommenderBuilder.getClass()

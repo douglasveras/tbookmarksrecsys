@@ -20,11 +20,17 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
+import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
+
 import com.google.gwt.dev.util.collect.HashSet;
 
 public final class EventsTwitterDataset extends AbstractDataset {
 
 	private static final EventsTwitterDataset INSTANCE = new EventsTwitterDataset();
+	private static final boolean initializeDM = false;
 
 	/*
 	 * public static String datasetURL =
@@ -48,8 +54,10 @@ public final class EventsTwitterDataset extends AbstractDataset {
 
 	private EventsTwitterDataset() {
 		try {
-			convertDatasetFileToDefaultPattern();
-			initializeDataModel();
+			if(initializeDM){
+				convertDatasetFileToDefaultPattern();
+				initializeDataModel();
+			}
 			initializeDBInfo();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -64,7 +72,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 	public static EventsTwitterDataset getInstance() {
 		return INSTANCE;
 	}
-
+	
 	private long getDifference(String text) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat(this.timestampFormat);
 		Date d = sdf.parse(text);

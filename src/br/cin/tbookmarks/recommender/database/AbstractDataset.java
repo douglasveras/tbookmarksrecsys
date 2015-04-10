@@ -6,6 +6,10 @@ import java.io.IOException;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 import org.apache.mahout.cf.taste.model.DataModel;
 
+import br.cin.tbookmarks.recommender.database.contextual.ContextualFileDataModel;
+import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
+import br.cin.tbookmarks.recommender.database.item.ItemInformation;
+
 public abstract class AbstractDataset {
 	protected DataModel model;
 	protected ItemDatasetInformation itemDatasetInformation;
@@ -29,7 +33,7 @@ public abstract class AbstractDataset {
 	}
 	
 	protected void initializeDataModel() throws IOException {
-		model = new FileDataModel(new File(System.getProperty("user.dir")
+		model = new ContextualFileDataModel(new File(System.getProperty("user.dir")
 				+ datasetURL));
 	}
 }
