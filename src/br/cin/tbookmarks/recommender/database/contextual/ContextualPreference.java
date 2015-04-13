@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions;
  * A simple {@link Preference} encapsulating an item and preference value.
  * </p>
  */
-public class ContextualPreference implements Preference, Serializable {
+public class ContextualPreference implements ContextualPreferenceInterface, Preference, Serializable {
   
   private final long userID;
   private final long itemID;
@@ -41,6 +41,18 @@ public class ContextualPreference implements Preference, Serializable {
     return value;
   }
   
+  private String contextualPreferencesToString(long cps[]){
+	  
+	  StringBuffer sb = new StringBuffer();
+	  
+	  for(int j = 0; j < cps.length; j++){
+		  sb.append(cps[j]);  
+		  sb.append(j+1 != cps.length ? "|" : "");
+      }
+	  
+	  return sb.toString();
+  }
+  
   @Override
   public void setValue(float value) {
     Preconditions.checkArgument(!Float.isNaN(value), "NaN value");
@@ -49,13 +61,15 @@ public class ContextualPreference implements Preference, Serializable {
   
   @Override
   public String toString() {
-    return "ContextualPreference[userID: " + userID + ", itemID:" + itemID + ", value:" + value + ", contextualPreferences:" + contextualPreferences +']';
+    return "ContextualPreference[userID: " + userID + ", itemID:" + itemID + ", value:" + value + ", contextualPreferences:" + contextualPreferencesToString(contextualPreferences) +']';
   }
   
+  @Override
   public long[] getContextualPreferences() {
 	return contextualPreferences;
   }
   
+  @Override
   public void setContextualPreferences(long[] contextualPreferences) {
 	this.contextualPreferences = contextualPreferences;
   }

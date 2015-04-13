@@ -37,8 +37,8 @@ import org.apache.mahout.common.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualDataModel;
-import br.cin.tbookmarks.recommender.database.contextual.ContextualFileDataModel;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualPreference;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualUserPreferenceArray;
 
@@ -57,6 +57,7 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	  private float maxPreference;
 	  private float minPreference;
 	  protected IDRescorer idrescorer;
+	  protected ContextualCriteria contextualCriteria;
 	  
 	  protected AbstractDifferenceRecommenderEvaluatorCrossDomain() {
 	    random = RandomUtils.getRandom();
@@ -113,7 +114,7 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 		      }
 		    }
 		    
-		    DataModel newDataModel = dataModel instanceof ContextualFileDataModel? new ContextualDataModel(trainingPrefs) : 
+		    DataModel newDataModel = dataModel instanceof ContextualDataModel? new ContextualDataModel(trainingPrefs) : 
 		    																	new GenericDataModel(trainingPrefs);
 		    
 		    DataModel trainingModel = dataModelBuilder == null ? newDataModel
@@ -170,6 +171,7 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	    for (int i = 0; i < size; i++) {
 	      Preference newPref = isInstanceOfContextualUserPreferenceArray ? new ContextualPreference(userID, prefs.getItemID(i), prefs.getValue(i), ((ContextualUserPreferenceArray)prefs).getContextualPreferences(i))
 	    		  																: new GenericPreference(userID, prefs.getItemID(i), prefs.getValue(i));
+	      //treina com todos os tipos de rating
 	      if (random.nextDouble() < trainingPercentage) {
 	        if (oneUserTrainingPrefs == null) {
 	          oneUserTrainingPrefs = Lists.newArrayListWithCapacity(3);
@@ -179,11 +181,19 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	        if (oneUserTestPrefs == null) {
 	          oneUserTestPrefs = Lists.newArrayListWithCapacity(3);
 	        }
-	        if(this.idrescorer == null){
+	        //testa somente com um tipo de rating (rescorer e/ou context)
+	        if(this.idrescorer == null && this.contextualCriteria == null){
 	        	oneUserTestPrefs.add(newPref);
 	        }else{
-	        	if(!this.idrescorer.isFiltered(newPref.getItemID())){
-	        		oneUserTestPrefs.add(newPref);
+	        	if(this.idrescorer != null && !this.idrescorer.isFiltered(newPref.getItemID())){
+	        		if(this.contextualCriteria != null && isInstanceOfContextualUserPreferenceArray){
+	        			ContextualPreference contextualPref = (ContextualPreference) newPref;
+	        			if(this.contextualCriteria.containsAllContextualAttributes(contextualPref.getContextualPreferences())){
+	        				oneUserTestPrefs.add(newPref);
+	        			}
+	        		}else{	        		
+	        			oneUserTestPrefs.add(newPref);
+	        		}
 	        	}
 	        }
 	      }

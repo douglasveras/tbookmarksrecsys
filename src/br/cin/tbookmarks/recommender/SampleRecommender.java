@@ -17,6 +17,9 @@ import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
+import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
+import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAttribute;
 import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
@@ -32,11 +35,11 @@ public class SampleRecommender {
 	private Recommenders recommenders;
 	private int maxOfRecommendedItems = 5;
 
-	public SampleRecommender(AbstractDataset absDataset, IDRescorer idrescorer) {
+	public SampleRecommender(AbstractDataset absDataset, IDRescorer idrescorer, ContextualCriteria contextualAttributes) {
 		this.absDataset = absDataset;
 		this.model = this.absDataset.getModel();
 		this.recommendedItems = new ArrayList<RecommendedItem>();
-		this.recommenders = new Recommenders(this.absDataset);
+		this.recommenders = new Recommenders(this.absDataset,contextualAttributes);
 
 		this.idrescorer = idrescorer;
 
@@ -85,17 +88,20 @@ public class SampleRecommender {
 		
 		ArrayList<ItemDomain> domainsFilter = new ArrayList<ItemDomain>();
 		domainsFilter.add(ItemDomain.MOVIE);
-		domainsFilter.add(ItemDomain.EVENT);
+		domainsFilter.add(ItemDomain.BOOK);
 		
 		IDRescorer idrescorer = new ItemDomainRescorer(null,domainsFilter, absDataset);
 		
-		SampleRecommender sr = new SampleRecommender(absDataset, idrescorer);
+		ContextualCriteria criteria = new ContextualCriteria(DayTypeContextualAttribute.WEEKEND,null);
+		
+		SampleRecommender sr = new SampleRecommender(absDataset, idrescorer,criteria);
+		
 
 		ArrayList<RecommenderBuilder> list = sr.recommenders
 				.getRecommenderBuilders();
 
 		try {
-			int userId = 6040; //6041
+			int userId = 6041; //6041
 
 			for (RecommenderBuilder recommenderBuilder : list) {
 				System.out.println("\n"+recommenderBuilder.getClass()

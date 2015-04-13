@@ -5,6 +5,8 @@ import org.apache.mahout.cf.taste.impl.common.RunningAverage;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
+
 public class AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain  extends AbstractDifferenceRecommenderEvaluatorCrossDomain{
 	  
 	  private RunningAverage average;
@@ -13,8 +15,9 @@ public class AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain  extends A
 			
 	  }
 	  
-	  public AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain(IDRescorer idrescorer) {
+	  public AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain(IDRescorer idrescorer, ContextualCriteria contextualCriteria) {
 		this.idrescorer = idrescorer;
+		this.contextualCriteria = contextualCriteria;
 	  }
 	  
 	  @Override

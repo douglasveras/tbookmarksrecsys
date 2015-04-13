@@ -5,6 +5,8 @@ import org.apache.mahout.cf.taste.impl.common.RunningAverage;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
+
 /**
  * <p>
  * A {@link org.apache.mahout.cf.taste.eval.RecommenderEvaluator} which computes the "root mean squared"
@@ -20,8 +22,9 @@ public final class RMSRecommenderEvaluatorCrossDomain extends AbstractDifference
 		
   }
   
-  public RMSRecommenderEvaluatorCrossDomain(IDRescorer idrescorer) {
+  public RMSRecommenderEvaluatorCrossDomain(IDRescorer idrescorer, ContextualCriteria contextualCriteria) {
 	this.idrescorer = idrescorer;
+	this.contextualCriteria = contextualCriteria;
   }
   
   @Override

@@ -243,7 +243,7 @@ public class ContextualFileDataModel extends AbstractDataModel {
         for (File updateFile : findUpdateFilesAfter(newLastModified)) {
           processFile(new FileLineIterator(updateFile, false), data, timestamps, false);
         }
-
+        
         return new ContextualDataModel(ContextualDataModel.toDataMap(data, true), timestamps);
 
       } else {
@@ -542,6 +542,7 @@ public class ContextualFileDataModel extends AbstractDataModel {
       }
     }
     log.info("Read lines: {}", count);
+   
   }
 
   protected void processLineWithoutID(String line,

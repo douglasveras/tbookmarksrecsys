@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.PatternSyntaxException;
 
 import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
@@ -71,6 +73,8 @@ public class ContextualFileGenerator {
 				+ "\\resources\\datasets\\cross-domain\\movies_cross_events_books.dat");
 		File fileOutput = new File(System.getProperty("user.dir") + "\\resources\\datasets\\cross-domain\\contextual_movies_cross_events_books.dat");
 
+		HashMap<Integer,HashSet<Long>> itensFromUsers = new HashMap<Integer, HashSet<Long>>();
+		
 		if (!fileOutput.exists()) {
 
 			FileInputStream stream;
@@ -95,6 +99,26 @@ public class ContextualFileGenerator {
 					
 					String userIdText = splitedLine[0];
 					String itemIdText = splitedLine[1];
+					
+					Integer userID = new Integer(userIdText);
+					Long itemID = new Long(itemIdText);
+					
+					if(itensFromUsers.get(userID) != null){
+						if(itensFromUsers.get(userID).contains(itemID)){
+							continue;
+						}else{
+							itensFromUsers.get(userID).add(itemID);
+							//itensFromUsers.put(userID, );
+						}
+					}else{
+						HashSet<Long> items = new HashSet<Long>();
+						items.add(itemID);
+						itensFromUsers.put(userID,items);
+					}
+						
+					
+					
+					
 					String rating = splitedLine[2];
 					String timestamp = splitedLine[3];
 					

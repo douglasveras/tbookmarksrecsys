@@ -84,7 +84,7 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
   }
 
   @Override
-  public Preference get(int i) {
+  public ContextualPreferenceInterface get(int i) {
     return new PreferenceView(i);
   }
 
@@ -220,10 +220,13 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
   private void swap(int i, int j) {
     long temp1 = ids[i];
     float temp2 = values[i];
+    long temp3[] = contextualPreferences[i];
     ids[i] = ids[j];
     values[i] = values[j];
+    contextualPreferences[i] = contextualPreferences[j];
     ids[j] = temp1;
     values[j] = temp2;
+    contextualPreferences[j] = temp3;
   }
 
   @Override
@@ -256,6 +259,18 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
       });
   }
 
+  private String contextualPreferencesToString(long cps[]){
+	  
+	  StringBuffer sb = new StringBuffer();
+	  
+	  for(int j = 0; j < cps.length; j++){
+		  sb.append(cps[j]);  
+		  sb.append(j+1 != cps.length ? "|" : "");
+      }
+	  
+	  return sb.toString();
+  }
+  
   @Override
   public String toString() {
     if (ids == null || ids.length == 0) {
@@ -271,14 +286,15 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
       }
       result.append(ids[i]);
       result.append('=');
-      result.append(values[i]);
-      result.append(contextualPreferences[i]);
+      result.append(values[i]+" ");
+      result.append(contextualPreferencesToString(contextualPreferences[i]));
+      
     }
     result.append("}]");
     return result.toString();
   }
 
-  private final class PreferenceView implements Preference {
+  private final class PreferenceView implements ContextualPreferenceInterface {
 
     private final int i;
 
@@ -309,6 +325,12 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
     public void setValue(float value) {
       values[i] = value;
     }
+
+	@Override
+	public void setContextualPreferences(long[] contextualPreference) {
+		contextualPreferences[i] = contextualPreference;
+		
+	}
     
     }
 

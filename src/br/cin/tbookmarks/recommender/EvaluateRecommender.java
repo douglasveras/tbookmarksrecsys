@@ -7,13 +7,16 @@ import org.apache.mahout.cf.taste.eval.IRStatistics;
 import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
 import org.apache.mahout.cf.taste.eval.RecommenderEvaluator;
 import org.apache.mahout.cf.taste.eval.RecommenderIRStatsEvaluator;
+import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator;
 import org.apache.mahout.cf.taste.impl.eval.AverageAbsoluteDifferenceRecommenderEvaluator;
 import org.apache.mahout.cf.taste.impl.eval.GenericRecommenderIRStatsEvaluator;
 import org.apache.mahout.cf.taste.impl.eval.RMSRecommenderEvaluator;
 import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.common.RandomUtils;
 
+import br.cin.tbookmarks.recommender.Recommenders.PreFilteringContextualBuildRecommender;
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
 import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
@@ -21,10 +24,14 @@ import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
 import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
+import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
+import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAttribute;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 import br.cin.tbookmarks.recommender.evaluation.AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain;
 import br.cin.tbookmarks.recommender.evaluation.RMSRecommenderEvaluatorCrossDomain;
 import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
+import br.cin.tbookmarks.util.Functions;
 
 
 public class EvaluateRecommender {
@@ -40,10 +47,10 @@ public class EvaluateRecommender {
 	private double relevantThresholdPrecisionRecall = GenericRecommenderIRStatsEvaluator.CHOOSE_THRESHOLD;
 	private boolean enableFixedTestSeed = true;
 	
-	public EvaluateRecommender(AbstractDataset dataset) {
+	public EvaluateRecommender(AbstractDataset dataset, ContextualCriteria contextualAttributes) {
 		this.dataset =dataset;
 		model = this.dataset.getModel();
-		this.recommenders = new Recommenders(this.dataset);
+		this.recommenders = new Recommenders(this.dataset,contextualAttributes);
 	}
 	
 	private void evaluateRecommender(RecommenderEvaluator evaluator) throws TasteException{
@@ -52,7 +59,18 @@ public class EvaluateRecommender {
 			if(enableFixedTestSeed){
 				RandomUtils.useTestSeed();
 			}
-			double result = evaluator.evaluate(recommenderBuilder, null, model,this.trainingPercentage, this.datasetPercentage);
+			
+			double result;
+			
+			if(recommenderBuilder instanceof PreFilteringContextualBuildRecommender){
+				DataModel contextualDM = ((PreFilteringContextualBuildRecommender) recommenderBuilder).preFilterDataModel(model);
+				
+				result = evaluator.evaluate(recommenderBuilder, null, contextualDM,this.trainingPercentage, this.datasetPercentage);
+				System.out.println("Number of ratings: "+Functions.numOfRatings(contextualDM));
+			}else{			
+				result = evaluator.evaluate(recommenderBuilder, null, model,this.trainingPercentage, this.datasetPercentage);
+				System.out.println("Number of ratings: "+Functions.numOfRatings(model));
+			}
 			System.out.println(recommenderBuilder.getClass().getSimpleName().toString()+": "+result);
 		}		
 	}
@@ -85,12 +103,14 @@ public class EvaluateRecommender {
 			//IDRescorer idrescorer = null;
 			
 			
-			EvaluateRecommender er = new EvaluateRecommender(dataset);
+			ContextualCriteria criteria = new ContextualCriteria(null,PeriodOfDayContextualAttribute.NIGHT);
 			
-			RecommenderEvaluator evaluator = new AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain(idrescorer);
+			EvaluateRecommender er = new EvaluateRecommender(dataset,criteria);
+			
+			RecommenderEvaluator evaluator = new AverageAbsoluteDifferenceRecommenderEvaluatorCrossDomain(idrescorer,criteria);
 			er.evaluateRecommender(evaluator);
 			
-			RecommenderEvaluator rmse = new RMSRecommenderEvaluatorCrossDomain(idrescorer);
+			RecommenderEvaluator rmse = new RMSRecommenderEvaluatorCrossDomain(idrescorer,criteria);
 			er.evaluateRecommender(rmse);
 
 			RecommenderIRStatsEvaluator precisionRecall = new GenericRecommenderIRStatsEvaluator();

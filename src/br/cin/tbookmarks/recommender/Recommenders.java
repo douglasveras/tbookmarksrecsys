@@ -40,28 +40,42 @@ import com.google.common.primitives.Longs;
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.GroupLensDataset;
 import br.cin.tbookmarks.recommender.database.contextual.AbstractContextualAttribute;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualDataModel;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualFileAttributeSequence;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualFileDataModel;
+import br.cin.tbookmarks.recommender.database.contextual.ContextualPreference;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualUserPreferenceArray;
+import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
+import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAttribute;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 import br.cin.tbookmarks.recommender.similarity.ItemCategoryItemSimilarity;
 import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
+import br.cin.tbookmarks.util.Functions;
 
 public class Recommenders {
 	
 	private ArrayList<RecommenderBuilder> recommenderBuilders;
 	private AbstractDataset dataset;
+	private ContextualCriteria contextualCriteria;
 	
-	public Recommenders(AbstractDataset dataset) {
+	public Recommenders(AbstractDataset dataset, ContextualCriteria contextualAttributes) {
 		recommenderBuilders = new ArrayList<RecommenderBuilder>();
 		this.dataset = dataset;
+		this.contextualCriteria = contextualAttributes;
 		
-		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedNearestNeighbor());
-		recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(null, this.new RecommenderBuilderUserBasedNearestNeighbor()));
-		recommenderBuilders.add(this.new RecommenderBuilderUserBasedTreshold());
-		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedTresholdWithRescorer(idrescorer));
-		recommenderBuilders.add(this.new RecommenderBuilderItemBased());
-		recommenderBuilders.add(this.new RecommenderBuilderSVD());
+		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedNearestNeighbor());		
+		recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor()));
+		
+		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedTreshold());
+		recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold()));
+		
+		//recommenderBuilders.add(this.new RecommenderBuilderItemBased());
+		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased()));
+		
+		//recommenderBuilders.add(this.new RecommenderBuilderSVD());
+		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD()));
+		
 		//recommenderBuilders.add(this.new MyRecommenderBuilderContentGenreBased(this.dataset));
 	}
 	
@@ -193,78 +207,63 @@ public class Recommenders {
 	
 	public class PreFilteringContextualBuildRecommender implements RecommenderBuilder{
 
-		private HashSet<AbstractContextualAttribute> contextualAttributes;
+		private ContextualCriteria contextualAttributes;
 		private RecommenderBuilder recommenderBuilder;
 		
-		public PreFilteringContextualBuildRecommender(HashSet<AbstractContextualAttribute> contexutalAttributes, RecommenderBuilder recommenderBuilder) {
+		public PreFilteringContextualBuildRecommender(ContextualCriteria contexutalAttributes, RecommenderBuilder recommenderBuilder) {
 			this.contextualAttributes = contexutalAttributes;
 			this.recommenderBuilder = recommenderBuilder;
 		}
 		
-		private boolean containsAllContextualAttributes(long[] contextualPreferences){
-			if(contextualAttributes != null){
-				for(int i = 0; i < contextualPreferences.length; i++){
-					boolean containsAttribute = false;
-					for(AbstractContextualAttribute contextualAtt : contextualAttributes){
-						if(contextualPreferences[i] == contextualAtt.getCode()){
-							containsAttribute = true;
-							break;
-						}
-					}
-					if(containsAttribute == false){
-						return false;
-					}
-				}
-				return true;
-			}else{
-				return false;
-			}
-		}
-		
-		private DataModel preFilterDataModel(DataModel model) throws TasteException{
-			
+		public DataModel preFilterDataModel(DataModel model) throws TasteException{
 			
 			//criar um novo datamodel verificando cada preferencia e adicionando no novo datamodel caso case com o contexto
-			
 			
 			FastByIDMap<PreferenceArray> preferences = new FastByIDMap<PreferenceArray>();
 			LongPrimitiveIterator userIdsIterator = model.getUserIDs();
 			
+			
 			while(userIdsIterator.hasNext()){
+				
 				Long userId = userIdsIterator.next();
 				PreferenceArray prefsForUser = model.getPreferencesFromUser(userId);
-				if(prefsForUser instanceof ContextualUserPreferenceArray){
-					
+				if(this.contextualAttributes != null && prefsForUser instanceof ContextualUserPreferenceArray){
+					ContextualUserPreferenceArray contextualPrefsForUser = (ContextualUserPreferenceArray) prefsForUser;
 					ArrayList<Long> newItemIds = new ArrayList<Long>();
+					ArrayList<Float> newPrefValues = new ArrayList<Float>();
 					ArrayList<List<Long>> newContextualPrefs = new ArrayList<List<Long>>();
 					
-					long[] itemIds = prefsForUser.getIDs();
-					for(int i = 0; i < itemIds.length; i++){
-						long[] contextualPreferencesForItemId = ((ContextualUserPreferenceArray)prefsForUser).getContextualPreferences(i);
+					for(int i = 0; i < contextualPrefsForUser.getIDs().length; i++){
 						
-						if(containsAllContextualAttributes(contextualPreferencesForItemId)){
-							newItemIds.add(itemIds[i]);
-							Long[] longObjects = ArrayUtils.toObject(contextualPreferencesForItemId);
+						if( this.contextualAttributes.containsAllContextualAttributes(contextualPrefsForUser.get(i).getContextualPreferences())){
+							newItemIds.add(contextualPrefsForUser.get(i).getItemID());
+							newPrefValues.add(contextualPrefsForUser.get(i).getValue());
+							Long[] longObjects = ArrayUtils.toObject(contextualPrefsForUser.get(i).getContextualPreferences());
 							newContextualPrefs.add(Arrays.asList(longObjects));
 						}
-					}
-										
-					ContextualUserPreferenceArray newPrefsForUser = new ContextualUserPreferenceArray(newItemIds.size());
-					newPrefsForUser.setUserID(0, userId);
-					
-					for(int n=0; n < newItemIds.size();n++){
-						newPrefsForUser.setItemID(n, newItemIds.get(n));
-						newPrefsForUser.setContextualPreferences(n, Longs.toArray(newContextualPrefs.get(n)));
+						
+						
 					}
 					
-					preferences.put(userId, newPrefsForUser);
+					if(newItemIds.size() > 0 && newContextualPrefs.size() > 0){
+						ContextualUserPreferenceArray newPrefsForUser = new ContextualUserPreferenceArray(newItemIds.size());
+						newPrefsForUser.setUserID(0, userId);
+						
+						for(int n=0; n < newItemIds.size();n++){
+							newPrefsForUser.setItemID(n, newItemIds.get(n));
+							newPrefsForUser.setValue(n, newPrefValues.get(n));
+							newPrefsForUser.setContextualPreferences(n, Longs.toArray(newContextualPrefs.get(n)));
+							
+						}
+						
+						preferences.put(userId, newPrefsForUser);
+					}
 				}else{
 					preferences.put(userId, prefsForUser);
 				}
 				
 			}
-			
-			
+			//System.out.println(counter);
 			DataModel filteredDataModel = new ContextualDataModel(preferences);
 			
 			return filteredDataModel;
@@ -274,17 +273,36 @@ public class Recommenders {
 		public Recommender buildRecommender(DataModel model)
 				throws TasteException {
 			
-			if(this.contextualAttributes == null){
+			if(model instanceof ContextualDataModel){
+				System.out.println("Number of ratings: "+Functions.numOfRatings(model));
 				return this.recommenderBuilder.buildRecommender(model);
 			}else{
-				DataModel dataModel = preFilterDataModel(model);
-				return this.recommenderBuilder.buildRecommender(dataModel);
+				DataModel contextualmodel = this.preFilterDataModel(model);
+				System.out.println("Number of ratings: "+Functions.numOfRatings(contextualmodel));
+				return this.recommenderBuilder.buildRecommender(contextualmodel);
 			}
-
-			
 		}
 		
 	}
+	
+	/*public class PostFilteringContextualBuildRecommender implements RecommenderBuilder{
+
+		private ContextualCriteria contextualAttributes;
+		private RecommenderBuilder recommenderBuilder;
+		
+		public PostFilteringContextualBuildRecommender(ContextualCriteria contexutalAttributes, RecommenderBuilder recommenderBuilder) {
+			this.contextualAttributes = contexutalAttributes;
+			this.recommenderBuilder = recommenderBuilder;
+		}
+		
+		@Override
+		public Recommender buildRecommender(DataModel model)
+				throws TasteException {
+			
+			return this.recommenderBuilder.buildRecommender(model);
+		}
+		
+	}*/
 	
 	
 }
