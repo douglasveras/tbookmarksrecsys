@@ -25,7 +25,7 @@ public final class GroupLensDataset extends AbstractDataset {
 	private static final boolean initializeDM = false;
 	
 	{
-		datasetURL = "\\resources\\datasets\\groupLens\\1M\\ratings.dat";
+		datasetURL = "\\resources\\datasets\\groupLens\\1M\\contextual_ratings.dat";
 	}
 	private String datasetInformationURL = "\\resources\\datasets\\groupLens\\1M\\movies.dat";
 	private String datasetInformationDelimiter = ";";
@@ -83,7 +83,7 @@ public final class GroupLensDataset extends AbstractDataset {
 			Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
 
 			for (int i = 0; i < categories.length; i++) {
-				itemCategories.add(ItemCategory.convertToItem(categories[i]
+				itemCategories.add(ItemCategory.getCategoryEnum(categories[i]
 						.toUpperCase()));
 			}
 

@@ -194,6 +194,11 @@ public abstract class AbstractDifferenceRecommenderEvaluatorCrossDomain implemen
 	        		}else{	        		
 	        			oneUserTestPrefs.add(newPref);
 	        		}
+	        	}else if(this.idrescorer == null && this.contextualCriteria != null && isInstanceOfContextualUserPreferenceArray){
+	        		ContextualPreference contextualPref = (ContextualPreference) newPref;
+        			if(this.contextualCriteria.containsAllContextualAttributes(contextualPref.getContextualPreferences())){
+        				oneUserTestPrefs.add(newPref);
+        			}
 	        	}
 	        }
 	      }

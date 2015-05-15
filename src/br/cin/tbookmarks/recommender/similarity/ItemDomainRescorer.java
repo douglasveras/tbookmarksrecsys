@@ -1,6 +1,7 @@
 package br.cin.tbookmarks.recommender.similarity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
@@ -10,11 +11,11 @@ import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 
 public class ItemDomainRescorer implements IDRescorer {
 
-	private final ArrayList<ItemDomain> itemDomainCriteria;
-	private final ArrayList<ItemDomain> itemDomainCriteriaExclusion;
+	private final HashSet<ItemDomain> itemDomainCriteria;
+	private final HashSet<ItemDomain> itemDomainCriteriaExclusion;
 	private final AbstractDataset dataset;
 
-	public ItemDomainRescorer(ArrayList<ItemDomain> itemDomainCriteria, ArrayList<ItemDomain> itemDomainCriteriaExclusion, AbstractDataset dataset) {
+	public ItemDomainRescorer(HashSet<ItemDomain> itemDomainCriteria, HashSet<ItemDomain> itemDomainCriteriaExclusion, AbstractDataset dataset) {
 		this.itemDomainCriteria = itemDomainCriteria;
 		this.dataset = dataset;
 		this.itemDomainCriteriaExclusion = itemDomainCriteriaExclusion;

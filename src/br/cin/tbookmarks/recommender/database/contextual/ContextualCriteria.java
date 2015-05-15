@@ -1,10 +1,19 @@
 package br.cin.tbookmarks.recommender.database.contextual;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class ContextualCriteria {
 	private DayTypeContextualAttribute dayTypeContextualAttribute;
 	private PeriodOfDayContextualAttribute periodOfDayContextualAttribute;
 	
 	public ContextualCriteria() {
+	}
+	
+	public ContextualCriteria(long contexts[]) {
+		
+		ContextualFileAttributeSequence instance = ContextualFileAttributeSequence.getInstance();		
+		this.dayTypeContextualAttribute = DayTypeContextualAttribute.getInstanceByCode(contexts[instance.get(DayTypeContextualAttribute.class)]);
+		this.periodOfDayContextualAttribute = PeriodOfDayContextualAttribute.getInstanceByCode(contexts[instance.get(PeriodOfDayContextualAttribute.class)]);
 	}
 	
 	public ContextualCriteria(
@@ -32,7 +41,7 @@ public class ContextualCriteria {
 		this.periodOfDayContextualAttribute = periodOfDayContextualAttribute;
 	}
 	
-	private int getCodeByIndex(int i){
+	private long getCodeByIndex(int i){
 		Class<? extends AbstractContextualAttribute> contextualAttributeClass = ContextualFileAttributeSequence.getInstance().get(i);
 		if(this.getDayTypeContextualAttribute() != null && contextualAttributeClass.equals(DayTypeContextualAttribute.class)){
 			return this.getDayTypeContextualAttribute().getCode();
@@ -57,4 +66,46 @@ public class ContextualCriteria {
 		}
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof ContextualCriteria){
+			ContextualCriteria test = (ContextualCriteria) obj;
+			if(test.getDayTypeContextualAttribute().equals(this.getDayTypeContextualAttribute())
+					&& test.getPeriodOfDayContextualAttribute().equals(this.getPeriodOfDayContextualAttribute())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		long dayType = -1;
+		
+		if(this.getDayTypeContextualAttribute() != null){
+			dayType = this.getDayTypeContextualAttribute().getCode();
+		}
+		
+		long periodOfDay = -1;
+		
+		if(this.getPeriodOfDayContextualAttribute() != null){
+			periodOfDay = this.getPeriodOfDayContextualAttribute().getCode();
+		}
+		
+		return new HashCodeBuilder(17, 31). // two randomly chosen prime numbers
+	            // if deriving: appendSuper(super.hashCode()).
+	            append(dayType).
+	            append(periodOfDay).
+	            toHashCode();
+	}
+	
+	@Override
+	public String toString() {
+		
+		String dayType = this.getDayTypeContextualAttribute() != null ? this.getDayTypeContextualAttribute().name() : "null";
+		String periodOfDay = this.getPeriodOfDayContextualAttribute() != null ? this.getPeriodOfDayContextualAttribute().name() : "null";
+		
+		return "DAY:"+dayType+", PERIOD:"+periodOfDay;
+	}
 }

@@ -1,6 +1,7 @@
 package br.cin.tbookmarks.recommender;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.mahout.cf.taste.common.TasteException;
@@ -10,6 +11,7 @@ import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
+import br.cin.tbookmarks.recommender.database.AmazonCrossDataset;
 import br.cin.tbookmarks.recommender.database.BookCrossingDataset;
 import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
 import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
@@ -84,14 +86,19 @@ public class SampleRecommender {
 
 	public static void main(String[] args) {
 		
-		AbstractDataset absDataset = MoviesCrossEventsBooksDataset.getInstance();
+		HashSet<ItemDomain> domainsDataset = new HashSet<ItemDomain>();
+		domainsDataset.add(ItemDomain.BOOK);
+		domainsDataset.add(ItemDomain.MOVIE);
+		//domainsFilter.add(ItemDomain.BOOK);
 		
-		ArrayList<ItemDomain> domainsFilter = new ArrayList<ItemDomain>();
-		domainsFilter.add(ItemDomain.MOVIE);
+		AbstractDataset absDataset = AmazonCrossDataset.getInstance();	
+		
+		HashSet<ItemDomain> domainsFilter = new HashSet<ItemDomain>();
 		domainsFilter.add(ItemDomain.BOOK);
 		
 		IDRescorer idrescorer = new ItemDomainRescorer(null,domainsFilter, absDataset);
 		
+		//ContextualCriteria criteria = new ContextualCriteria(DayTypeContextualAttribute.WEEKEND,PeriodOfDayContextualAttribute.DAWN);
 		ContextualCriteria criteria = new ContextualCriteria(DayTypeContextualAttribute.WEEKEND,null);
 		
 		SampleRecommender sr = new SampleRecommender(absDataset, idrescorer,criteria);
@@ -101,7 +108,7 @@ public class SampleRecommender {
 				.getRecommenderBuilders();
 
 		try {
-			int userId = 6041; //6041
+			int userId =41; //6041
 
 			for (RecommenderBuilder recommenderBuilder : list) {
 				System.out.println("\n"+recommenderBuilder.getClass()

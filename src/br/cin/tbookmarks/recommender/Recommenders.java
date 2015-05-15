@@ -19,6 +19,7 @@ import org.apache.mahout.cf.taste.impl.recommender.CachingRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer;
+import org.apache.mahout.cf.taste.impl.recommender.svd.Factorizer;
 import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender;
 import org.apache.mahout.cf.taste.impl.similarity.CachingItemSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.CachingUserSimilarity;
@@ -64,17 +65,62 @@ public class Recommenders {
 		this.dataset = dataset;
 		this.contextualCriteria = contextualAttributes;
 		
-		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedNearestNeighbor());		
-		recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor()));
+		PostFilteringStrategyRecommendation pfStrategy1 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_ONE_OCCURENCY,false,0.0f);		
+		PostFilteringStrategyRecommendation pfStrategy2 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_TWO_OCCURRENCIES,false,0.0f);
+		PostFilteringStrategyRecommendation pfStrategy3 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.MOST_OCCURRED,false,0.0f);
+		PostFilteringStrategyRecommendation pfStrategy4 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_MEDIA_OF_OCCURRENCIES,false,0.0f);
+		PostFilteringStrategyRecommendation pfStrategy5 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_ONE_OCCURENCY,true,4.0f);		
+		PostFilteringStrategyRecommendation pfStrategy6 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_TWO_OCCURRENCIES,true,4.0f);
+		PostFilteringStrategyRecommendation pfStrategy7 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.MOST_OCCURRED,true,4.0f);
+		PostFilteringStrategyRecommendation pfStrategy8 = new PostFilteringStrategyRecommendation(PostFilteringStrategyRecommendation.PossibleFilteringStrategies.AT_LEAST_MEDIA_OF_OCCURRENCIES,true,4.0f);
+
 		
+		
+		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedNearestNeighbor());
+		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor()));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy1,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy2,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy3,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy4,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy5,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy6,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy7,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedNearestNeighbor(),pfStrategy8,this.dataset));
+		
+
 		//recommenderBuilders.add(this.new RecommenderBuilderUserBasedTreshold());
-		recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold()));
-		
+		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold()));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy1,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy2,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy3,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy4,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy5,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy6,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy7,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderUserBasedTreshold(),pfStrategy8,this.dataset));
+
+
 		//recommenderBuilders.add(this.new RecommenderBuilderItemBased());
 		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased()));
-		
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy1,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy2,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy3,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy4,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy5,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy6,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy7,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderItemBased(),pfStrategy8,this.dataset));
+				
 		//recommenderBuilders.add(this.new RecommenderBuilderSVD());
 		//recommenderBuilders.add(this.new PreFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD()));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy1,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy2,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy3,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy4,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy5,this.dataset));
+		//recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy6,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy7,this.dataset));
+		recommenderBuilders.add(this.new PostFilteringContextualBuildRecommender(this.contextualCriteria, this.new RecommenderBuilderSVD(),pfStrategy8,this.dataset));
 		
 		//recommenderBuilders.add(this.new MyRecommenderBuilderContentGenreBased(this.dataset));
 	}
@@ -104,7 +150,7 @@ public class Recommenders {
 	
 	public class RecommenderBuilderUserBasedNearestNeighbor implements RecommenderBuilder{
 
-		private int neiborSize = 500;
+		private int neiborSize = 475;
 		
 		@Override
 		public Recommender buildRecommender(DataModel model)
@@ -118,6 +164,10 @@ public class Recommenders {
 			return cr;
 		}
 		
+		@Override
+		public String toString() {
+			return "NearestNeighbor_UserBased"+"(N="+neiborSize+")";
+		}
 	}
 	
 	public class RecommenderBuilderUserBasedTreshold implements RecommenderBuilder{
@@ -136,6 +186,11 @@ public class Recommenders {
 					dataModel, neighborhood, similarity);
 			return new CachingRecommender(recommender); 
 
+		}
+		
+		@Override
+		public String toString() {
+			return "Threshold_UserBased"+"(Thrs="+threshold+")";
 		}
 	}
 	
@@ -173,17 +228,31 @@ public class Recommenders {
 			return new CachingRecommender(recommender);
 		}
 		
+		@Override
+		public String toString() {
+			return "CF-ItemBased";
+		}
+		
 	}
 	
 	public class RecommenderBuilderSVD implements RecommenderBuilder{
+		
+		private int numOfFeatures = 10;
+		private double lambda = 0.05;
+		private int numOfIterations = 10;
 		
 		@Override
 		public Recommender buildRecommender(DataModel dataModel)
 				throws TasteException {
 			
-			Recommender recommender = new SVDRecommender(dataModel, new ALSWRFactorizer(dataModel, 10, 0.05, 10));
+			Recommender recommender = new SVDRecommender(dataModel, new ALSWRFactorizer(dataModel, numOfFeatures, lambda, numOfIterations));
 			return new CachingRecommender(recommender);
 
+		}
+		
+		@Override
+		public String toString() {
+			return "SVD"+"(Feat="+numOfFeatures+", lambda="+lambda+", iterat="+numOfIterations+")";
 		}
 	}
 	
@@ -213,6 +282,11 @@ public class Recommenders {
 		public PreFilteringContextualBuildRecommender(ContextualCriteria contexutalAttributes, RecommenderBuilder recommenderBuilder) {
 			this.contextualAttributes = contexutalAttributes;
 			this.recommenderBuilder = recommenderBuilder;
+		}
+		
+		@Override
+		public String toString() {
+			return "PreF"+"(CF-based="+recommenderBuilder+")";
 		}
 		
 		public DataModel preFilterDataModel(DataModel model) throws TasteException{
@@ -274,35 +348,51 @@ public class Recommenders {
 				throws TasteException {
 			
 			if(model instanceof ContextualDataModel){
-				System.out.println("Number of ratings: "+Functions.numOfRatings(model));
+				//System.out.println("Number of ratings: "+Functions.numOfRatings(model));
 				return this.recommenderBuilder.buildRecommender(model);
 			}else{
 				DataModel contextualmodel = this.preFilterDataModel(model);
-				System.out.println("Number of ratings: "+Functions.numOfRatings(contextualmodel));
+				//System.out.println("Number of ratings: "+Functions.numOfRatings(contextualmodel));
 				return this.recommenderBuilder.buildRecommender(contextualmodel);
 			}
 		}
 		
 	}
 	
-	/*public class PostFilteringContextualBuildRecommender implements RecommenderBuilder{
+	public class PostFilteringContextualBuildRecommender implements RecommenderBuilder{
 
 		private ContextualCriteria contextualAttributes;
 		private RecommenderBuilder recommenderBuilder;
+		private PostFilteringStrategyRecommendation postFilteringStrategyRecommendation;
+		private AbstractDataset dataset;
 		
-		public PostFilteringContextualBuildRecommender(ContextualCriteria contexutalAttributes, RecommenderBuilder recommenderBuilder) {
+		public PostFilteringContextualBuildRecommender(ContextualCriteria contexutalAttributes, RecommenderBuilder recommenderBuilder, 
+														PostFilteringStrategyRecommendation postFilteringStrategyRecommendation,
+														AbstractDataset dataset) {
 			this.contextualAttributes = contexutalAttributes;
 			this.recommenderBuilder = recommenderBuilder;
+			this.postFilteringStrategyRecommendation = postFilteringStrategyRecommendation;
+			this.dataset = dataset;
 		}
-		
+				
 		@Override
 		public Recommender buildRecommender(DataModel model)
 				throws TasteException {
 			
-			return this.recommenderBuilder.buildRecommender(model);
+			//if(model instanceof ContextualDataModel){
+				return new PostFilteringContextualRecommender(this.recommenderBuilder.buildRecommender(model),contextualAttributes, this.postFilteringStrategyRecommendation,this.dataset);
+			//}
+			
+			//return null;
+			
 		}
 		
-	}*/
+		@Override
+		public String toString() {
+			return "PostF"+"(CF-based="+recommenderBuilder+", strategy: "+postFilteringStrategyRecommendation.getPostFilteringStrategy()+"[onlyGoodRatings: "+postFilteringStrategyRecommendation.isOnlyWithGoodRatings()+", minimal: "+postFilteringStrategyRecommendation.getGoodRatingMin() +"])";
+		}
+		
+	}
 	
 	
 }

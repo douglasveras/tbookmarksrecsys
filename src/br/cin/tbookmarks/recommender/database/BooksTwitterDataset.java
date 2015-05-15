@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +22,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 import br.cin.tbookmarks.recommender.database.item.ItemInformation;
@@ -30,8 +36,8 @@ import com.google.gwt.dev.util.collect.HashSet;
 public final class BooksTwitterDataset extends AbstractDataset {
 
 	private static final BooksTwitterDataset INSTANCE = new BooksTwitterDataset();
-	private static final boolean initializeDM = false;
-
+	private static final boolean initializeDM = true;
+	
 	/*
 	 * public static String datasetURL =
 	 * "\\resources\\datasets\\groupLens\\100K\\ua.base"; public static String
@@ -41,7 +47,7 @@ public final class BooksTwitterDataset extends AbstractDataset {
 
 	private String datasetURLOriginal = "\\resources\\datasets\\twitter\\books\\books_ratings.dat";
 	{
-		datasetURL = "\\resources\\datasets\\twitter\\books\\books_ratings_new.dat";
+		datasetURL = "\\resources\\datasets\\twitter\\books\\contextual_books_ratings.dat";
 	}
 	private String datasetInformationURL = "\\resources\\datasets\\twitter\\books\\books.dat";
 	private String datasetInformationDelimiter = "::";
@@ -73,6 +79,15 @@ public final class BooksTwitterDataset extends AbstractDataset {
 
 	public static BooksTwitterDataset getInstance() {
 		return INSTANCE;
+	}
+	
+	private Integer getBookID(HashMap<String, Integer> itemIdMaps, String bookText){
+		for(String bookTitle : itemIdMaps.keySet()){
+			if(bookTitle.equalsIgnoreCase(bookText)){
+				return itemIdMaps.get(bookTitle);
+			}
+		}
+		return -1;
 	}
 
 	private void convertDatasetFileToDefaultPattern() {
@@ -130,18 +145,21 @@ public final class BooksTwitterDataset extends AbstractDataset {
 					String[] aux = replaced
 							.split(this.datasetInformationDelimiter);
 
-					String itemIdText = aux[2];
-					if (itemIdText.contains("-")) {
-						itemIdText = itemIdText.split("-")[0];
-					} else if (itemIdText.contains(".")) {
+					String itemIdText = aux[3];
+					String itemIDRated = "";
+					
+					if (itemIdText.contains("(")) {
+						itemIdText = itemIdText.split("\\(")[0].trim();
+					}/* else if (itemIdText.contains(".")) {
 						itemIdText = itemIdText.split("\\.")[0];
-					}
-					if (!itemIdMaps.keySet().contains(itemIdText)) {
+					}*/
+					Integer itemIDaux = getBookID(itemIdMaps,itemIdText);
+					if (itemIDaux == -1) {
 						itemIdMaps.put(itemIdText, itemId);
-						itemIdText = String.valueOf(itemId);
+						itemIDRated = String.valueOf(itemId);
 						itemId++;
 					} else {
-						itemIdText = String.valueOf(itemIdMaps.get(itemIdText));
+						itemIDRated = String.valueOf(itemIDaux);
 					}
 
 					String timeStamp = aux[5];
@@ -158,14 +176,18 @@ public final class BooksTwitterDataset extends AbstractDataset {
 						userIdText = String.valueOf(idMaps.get(aux[0]));
 					}
 
-					bw.append(userIdText + "\t" + itemIdText + "\t" + rating
-							+ "\t" + timeStamp);
+					String delimiter = "\t";
+					
+					bw.append(userIdText + delimiter + itemIDRated + delimiter + rating
+							+ delimiter + timeStamp);
 					bw.newLine();
 
-					if (!itemIdInformation.contains(itemIdText)) {
-						bwInfo.append(itemIdText + "::" + aux[3]);
+					if (!itemIdInformation.contains(itemIDRated)) {
+						String categoriesText = getCategoryFromResponseAPI(itemIdText);
+						bwInfo.append(itemIDRated + delimiter + itemIdText + delimiter
+												+ categoriesText);
 						bwInfo.newLine();
-						itemIdInformation.add(itemIdText);
+						itemIdInformation.add(itemIDRated);
 					}
 
 				}
@@ -189,9 +211,8 @@ public final class BooksTwitterDataset extends AbstractDataset {
 			} catch (PatternSyntaxException e) {
 				System.err.println(line);
 				e.printStackTrace();
-			}
+			} 
 		}
-
 	}
 
 	private String removeCommaInField(String line) {
@@ -211,6 +232,75 @@ public final class BooksTwitterDataset extends AbstractDataset {
 		return replaced;
 	}
 
+	private String httpGet(String urlStr) throws IOException, InterruptedException {
+		  URL url = new URL(urlStr.replaceAll(" ", "%20"));
+		  
+		  HttpURLConnection conn =
+		      (HttpURLConnection) url.openConnection();
+		  		  
+		  if (conn.getResponseCode() != 200) {
+		    throw new IOException(conn.getResponseMessage());
+		  }
+
+		  // Buffer the result into a string
+		  BufferedReader rd = new BufferedReader(
+		      new InputStreamReader(conn.getInputStream()));
+		  StringBuilder sb = new StringBuilder();
+		  String line;
+		  while ((line = rd.readLine()) != null) {
+		    sb.append(line);
+		  }
+		  rd.close();
+
+		  conn.disconnect();
+		  return sb.toString();
+		}
+	
+	private String getCategoryFromResponseAPI(String bookTitle){
+		StringBuffer categories =  new StringBuffer();
+		try {
+			String result = httpGet("https://www.goodreads.com/book/show/"+bookTitle);
+			JSONObject obj;
+		
+			obj = new JSONObject(result);
+		 
+			JSONArray items = obj.getJSONArray("items");
+			for (int i = 0; i < items.length(); i++)
+			{
+			    String bookTitleJSON = items.getJSONObject(i).getJSONObject("volumeInfo").getString("title");
+			    boolean bookSubtitleJSONIsNull = items.getJSONObject(i).getJSONObject("volumeInfo").isNull("subtitle");
+			    
+			    String titlePlusSub = "";
+			    
+			    if(!bookSubtitleJSONIsNull){
+			    	titlePlusSub = bookTitleJSON+": "+items.getJSONObject(i).getJSONObject("volumeInfo").getString("subtitle");
+			    }
+			    
+			    if(bookTitleJSON.equalsIgnoreCase(bookTitle) || titlePlusSub.equalsIgnoreCase(bookTitle)){
+			    	JSONArray categoriesJSON = items.getJSONObject(i).getJSONObject("volumeInfo").getJSONArray("categories");
+			    	for(int j=0; j < categoriesJSON.length();j++){
+				    		categories.append(categoriesJSON.get(j).toString());
+				    		categories.append("|");
+				    	}
+				    return categories.substring(0, categories.length()-1);
+			    	
+			    }
+			    
+			}
+		}
+		catch (JSONException e) {
+			System.err.println(e.getMessage()+" for "+bookTitle);
+			//System.err.println("Categories of"+bookTitle+" not found");
+		} catch (IOException e) {
+			System.err.println(e.getMessage()+" for "+bookTitle);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		categories.append("Unknown");
+		return categories.toString();
+	}
+	
 	private void initializeDBInfo() throws NumberFormatException, IOException {
 
 		itemDatasetInformation = new ItemDatasetInformation();
@@ -250,16 +340,16 @@ public final class BooksTwitterDataset extends AbstractDataset {
 			itemInfo.setId(Long.parseLong(row[0]));
 
 			itemInfo.setName(row[1]);
-			// String categories[] = row[index].split("\\|");
-
-			// TODO: Get categories online
-			/*
-			 * Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
-			 * itemCategories.add(ItemCategory.MUSICAL);
-			 * 
-			 * 
-			 * itemInfo.setCategories(itemCategories);
-			 */
+			//System.out.println(line);
+			String categories[] = row[2].split("\\|");
+			
+			 Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
+			 for(String category : categories){
+				 itemCategories.add(ItemCategory.getCategoryEnum(category.toUpperCase()));
+			 }			  
+			  
+			 itemInfo.setCategories(itemCategories);
+			 
 			// itemInfo.setYearReleased(row[index++]);
 			// itemInfo.setLink(row[index++]);
 

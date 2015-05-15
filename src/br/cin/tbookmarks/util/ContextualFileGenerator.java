@@ -20,9 +20,9 @@ import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAt
 
 public class ContextualFileGenerator {
 	
-	private static int getDayType(String timestamp) {
+	public static long getDayType(String timestamp, int mult) {
 
-		Date d = new Date(new Long(timestamp)*1000);
+		Date d = new Date(new Long(timestamp)*mult);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(d);
 		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
@@ -35,8 +35,8 @@ public class ContextualFileGenerator {
 
 	}
 	
-	private static int getPeriodOfDay(String timestamp) {
-		Date d = new Date(new Long(timestamp)*1000);
+	public static long getPeriodOfDay(String timestamp, int mult) {
+		Date d = new Date(new Long(timestamp)*mult);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(d);
 		int hourOfDay = cal.get(Calendar.HOUR_OF_DAY)+3; //GMT +3
@@ -70,8 +70,8 @@ public class ContextualFileGenerator {
 
 	public static void main(String[] args) {
 		File fileEN = new File(System.getProperty("user.dir")
-				+ "\\resources\\datasets\\cross-domain\\movies_cross_events_books.dat");
-		File fileOutput = new File(System.getProperty("user.dir") + "\\resources\\datasets\\cross-domain\\contextual_movies_cross_events_books.dat");
+				+ "\\resources\\datasets\\twitter\\books\\contextual_books_ratings.dat");
+		File fileOutput = new File(System.getProperty("user.dir") + "\\resources\\datasets\\twitter\\books\\contextual_books_ratings_new.dat");
 
 		HashMap<Integer,HashSet<Long>> itensFromUsers = new HashMap<Integer, HashSet<Long>>();
 		
@@ -80,6 +80,8 @@ public class ContextualFileGenerator {
 			FileInputStream stream;
 
 			String line = "";
+			
+			//String itemIdText = "";
 			try {
 				stream = new FileInputStream(fileEN);
 
@@ -105,6 +107,7 @@ public class ContextualFileGenerator {
 					
 					if(itensFromUsers.get(userID) != null){
 						if(itensFromUsers.get(userID).contains(itemID)){
+							//System.out.println(userID+" "+itemID);
 							continue;
 						}else{
 							itensFromUsers.get(userID).add(itemID);
@@ -122,8 +125,8 @@ public class ContextualFileGenerator {
 					String rating = splitedLine[2];
 					String timestamp = splitedLine[3];
 					
-					int dayType = getDayType(timestamp);
-					int periodOfDay = getPeriodOfDay(timestamp);
+					long dayType = getDayType(timestamp,1000);
+					long periodOfDay = getPeriodOfDay(timestamp,1000);
 
 					bw.append(userIdText + "\t" + itemIdText + "\t" + rating
 							+ "\t" + dayType+"|"+periodOfDay);
@@ -149,6 +152,8 @@ public class ContextualFileGenerator {
 			} catch (PatternSyntaxException e) {
 				System.err.println(line);
 				e.printStackTrace();
+			} catch (java.lang.NumberFormatException e) {
+				System.out.println(line);
 			}
 		}
 	

@@ -46,7 +46,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 	private boolean haveHeader = true;
 	private HashMap<String, String> implicitExplicitMapping;
 	{
-		datasetURL = "\\resources\\datasets\\twitter\\events\\events_ratings_new.dat";
+		datasetURL = "\\resources\\datasets\\twitter\\events\\contextual_events_ratings.dat";
 		implicitExplicitMapping = new HashMap<String, String>();
 		implicitExplicitMapping.put("Maybe", "2.5");
 		implicitExplicitMapping.put("Yes", "4.0");
@@ -234,7 +234,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 			//String categories[] = row[index].split("\\|");
 
 			Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
-			itemCategories.add(ItemCategory.MUSICAL);
+			itemCategories.add(ItemCategory.MUSICALS);
 			
 
 			itemInfo.setCategories(itemCategories);

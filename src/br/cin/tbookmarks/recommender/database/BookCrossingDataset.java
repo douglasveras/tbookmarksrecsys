@@ -224,7 +224,7 @@ public final class BookCrossingDataset extends AbstractDataset {
 			//String categories[] = row[index].split("\\|");
 
 			Set<ItemCategory> itemCategories = new HashSet<ItemCategory>();
-			itemCategories.add(ItemCategory.MUSICAL);
+			itemCategories.add(ItemCategory.MUSICALS);
 			
 
 			itemInfo.setCategories(itemCategories);
