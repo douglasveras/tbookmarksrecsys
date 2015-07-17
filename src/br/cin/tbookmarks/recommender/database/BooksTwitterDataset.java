@@ -11,17 +11,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +60,7 @@ public final class BooksTwitterDataset extends AbstractDataset {
 		try {
 			if(initializeDM){
 				convertDatasetFileToDefaultPattern();
-				initializeDataModel();
+			//	initializeDataModel();
 			}
 			initializeDBInfo();
 		} catch (IOException e) {
@@ -90,7 +86,7 @@ public final class BooksTwitterDataset extends AbstractDataset {
 		return -1;
 	}
 
-	private void convertDatasetFileToDefaultPattern() {
+	private void convertDatasetFileToDefaultPattern() {/*
 
 		File fileEN = new File(System.getProperty("user.dir")
 				+ datasetURLOriginal);
@@ -150,9 +146,9 @@ public final class BooksTwitterDataset extends AbstractDataset {
 					
 					if (itemIdText.contains("(")) {
 						itemIdText = itemIdText.split("\\(")[0].trim();
-					}/* else if (itemIdText.contains(".")) {
+					} else if (itemIdText.contains(".")) {
 						itemIdText = itemIdText.split("\\.")[0];
-					}*/
+					}
 					Integer itemIDaux = getBookID(itemIdMaps,itemIdText);
 					if (itemIDaux == -1) {
 						itemIdMaps.put(itemIdText, itemId);
@@ -213,7 +209,7 @@ public final class BooksTwitterDataset extends AbstractDataset {
 				e.printStackTrace();
 			} 
 		}
-	}
+	*/}
 
 	private String removeCommaInField(String line) {
 

@@ -10,6 +10,7 @@ public enum PeriodOfDayContextualAttribute implements AbstractContextualAttribut
 		this.code = value;
 	}
 
+	@Override
 	public long getCode() {
 		return this.code;
 	}

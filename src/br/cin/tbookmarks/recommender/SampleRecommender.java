@@ -10,24 +10,15 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 
+import br.cin.tbookmarks.recommender.algorithms.Recommenders;
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.AmazonCrossDataset;
-import br.cin.tbookmarks.recommender.database.BookCrossingDataset;
-import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
-import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
-import br.cin.tbookmarks.recommender.database.GroupLensDataset;
-import br.cin.tbookmarks.recommender.database.MoviesCrossBooksDataset;
-import br.cin.tbookmarks.recommender.database.MoviesCrossEventsBooksDataset;
-import br.cin.tbookmarks.recommender.database.MoviesCrossEventsDataset;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
 import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
-import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAttribute;
-import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
-import br.cin.tbookmarks.recommender.similarity.ItemCategoryRescorer;
 import br.cin.tbookmarks.recommender.similarity.ItemDomainRescorer;
 
-public class SampleRecommender {
+public class SampleRecommender {/*
 
 	private DataModel model;
 	private List<RecommendedItem> recommendedItems;
@@ -126,4 +117,4 @@ public class SampleRecommender {
 
 	}
 
-}
+*/}

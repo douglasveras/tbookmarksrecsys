@@ -1,8 +1,5 @@
 package br.cin.tbookmarks.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
@@ -16,6 +13,7 @@ import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.BooksTwitterDataset;
 import br.cin.tbookmarks.recommender.database.EventsTwitterDataset;
 import br.cin.tbookmarks.recommender.database.GroupLensDataset;
+import br.cin.tbookmarks.recommender.database.item.ItemDomain;
 
 public final class Functions {
 		
@@ -36,10 +34,10 @@ public final class Functions {
 		return counter;
 	}
 	
-	public static final void printNumOfUsersAndOverlappedUsers(DataModel datamodel){
+	public static final int[] getNumOfUsersAndOverlappedUsers(DataModel datamodel, AbstractDataset dataset){
 
 		int counterOverlapped = 0,counterUsers = 0;
-		
+				
 		try {
 			LongPrimitiveIterator iterator = datamodel.getUserIDs();
 			
@@ -49,19 +47,17 @@ public final class Functions {
 				long itemsFromUser[] = datamodel.getPreferencesFromUser(userId).getIDs(); 
 				
 				boolean hasMovie = false;
-				boolean hasEvent = false;
+				//boolean hasEvent = false;
 				boolean hasBook = false;
 				
 				for(int i=0; i < itemsFromUser.length;i++){
-					if(!hasMovie && GroupLensDataset.getInstance().getRecommendedItemInformationByID(itemsFromUser[i]) != null ){
+					if(!hasMovie && dataset.getRecommendedItemInformationByID(itemsFromUser[i]).getItemDomain().equals(ItemDomain.MOVIE)){
 						hasMovie = true;
-					}else if(!hasBook && BooksTwitterDataset.getInstance().getRecommendedItemInformationByID(itemsFromUser[i]) != null){
+					}else if(!hasBook && dataset.getRecommendedItemInformationByID(itemsFromUser[i]).getItemDomain().equals(ItemDomain.BOOK)){
 						hasBook = true;
-					}else if(!hasEvent && EventsTwitterDataset.getInstance().getRecommendedItemInformationByID(itemsFromUser[i]) != null){
-						hasEvent = true;
 					}
 					
-					if(hasMovie && hasEvent && hasBook){
+					if(hasMovie && hasBook){
 						counterOverlapped++;
 						break;
 					}
@@ -75,6 +71,8 @@ public final class Functions {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		int info[] = {counterUsers,counterOverlapped};
+		return info;
 	
 	}
 	

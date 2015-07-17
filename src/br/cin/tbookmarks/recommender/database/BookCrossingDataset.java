@@ -18,8 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-
 import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
@@ -47,7 +45,7 @@ public final class BookCrossingDataset extends AbstractDataset {
 	private BookCrossingDataset() {
 		try {
 			convertDatasetFileToDefaultPattern();
-			initializeDataModel();
+			//initializeDataModel();
 			initializeDBInfo();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -70,7 +68,7 @@ public final class BookCrossingDataset extends AbstractDataset {
 		return d.getTime();
 	}
 
-	private void convertDatasetFileToDefaultPattern() {
+	private void convertDatasetFileToDefaultPattern() {/*
 
 		File fileEN = new File(System.getProperty("user.dir")
 				+ datasetURLOriginal);
@@ -162,7 +160,7 @@ public final class BookCrossingDataset extends AbstractDataset {
 			}
 		}
 
-	}
+	*/}
 
 	private String removeCommaInField(String line) {
 		

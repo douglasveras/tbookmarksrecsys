@@ -2,43 +2,15 @@ package br.cin.tbookmarks.recommender;
 
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
-import br.cin.tbookmarks.recommender.database.contextual.AbstractContextualAttribute;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
-import br.cin.tbookmarks.recommender.database.item.ItemCategory;
-
-import com.google.common.base.Preconditions;
-
 import org.apache.mahout.cf.taste.common.Refreshable;
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.common.FastIDSet;
-import org.apache.mahout.cf.taste.impl.common.FullRunningAverage;
-import org.apache.mahout.cf.taste.impl.common.RefreshHelper;
-import org.apache.mahout.cf.taste.impl.common.RunningAverage;
-import org.apache.mahout.cf.taste.impl.recommender.AbstractRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.EstimatedPreferenceCapper;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.PreferredItemsNeighborhoodCandidateItemsStrategy;
-import org.apache.mahout.cf.taste.impl.recommender.TopItems;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.model.PreferenceArray;
-import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
-import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
-import org.apache.mahout.cf.taste.recommender.MostSimilarItemsCandidateItemsStrategy;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.recommender.Rescorer;
-import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
-import org.apache.mahout.common.LongPair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class PostFilteringContextualRecommender implements Recommender{

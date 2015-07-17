@@ -1,14 +1,10 @@
 package br.cin.tbookmarks.recommender.database;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,10 +12,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-
 import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 import br.cin.tbookmarks.recommender.database.item.ItemDatasetInformation;
 import br.cin.tbookmarks.recommender.database.item.ItemDomain;
@@ -56,7 +48,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 		try {
 			if(initializeDM){
 				convertDatasetFileToDefaultPattern();
-				initializeDataModel();
+				//initializeDataModel();
 			}
 			initializeDBInfo();
 		} catch (IOException e) {
@@ -86,7 +78,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 				+ datasetURLOriginal);
 		File fileOutput = new File(System.getProperty("user.dir") + datasetURL);
 
-		if (!fileOutput.exists()) {
+		if (!fileOutput.exists()) {/*
 
 			FileInputStream stream;
 
@@ -170,7 +162,7 @@ public final class EventsTwitterDataset extends AbstractDataset {
 				System.err.println(line);
 				e.printStackTrace();
 			}
-		}
+		*/}
 
 	}
 

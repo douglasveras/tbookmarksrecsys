@@ -312,7 +312,8 @@ public final class ContextualUserPreferenceArray implements PreferenceArray {
       return ContextualUserPreferenceArray.this.getItemID(i);
     }
     
-    public long[] getContextualPreferences() {
+    @Override
+	public long[] getContextualPreferences() {
         return ContextualUserPreferenceArray.this.getContextualPreferences(i);
       }
 

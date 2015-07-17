@@ -1,15 +1,9 @@
 package br.cin.tbookmarks.recommender;
 
-import java.util.ArrayList;
-
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.impl.recommender.AbstractCandidateItemsStrategy;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.model.PreferenceArray;
-
-import com.google.common.primitives.Longs;
-
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 

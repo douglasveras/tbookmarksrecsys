@@ -1,20 +1,10 @@
 package br.cin.tbookmarks.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.regex.PatternSyntaxException;
-
 import br.cin.tbookmarks.recommender.database.contextual.DayTypeContextualAttribute;
 import br.cin.tbookmarks.recommender.database.contextual.PeriodOfDayContextualAttribute;
 
@@ -75,7 +65,7 @@ public class ContextualFileGenerator {
 
 		HashMap<Integer,HashSet<Long>> itensFromUsers = new HashMap<Integer, HashSet<Long>>();
 		
-		if (!fileOutput.exists()) {
+		if (!fileOutput.exists()) {/*
 
 			FileInputStream stream;
 
@@ -155,7 +145,7 @@ public class ContextualFileGenerator {
 			} catch (java.lang.NumberFormatException e) {
 				System.out.println(line);
 			}
-		}
+		*/}
 	
 
 	}

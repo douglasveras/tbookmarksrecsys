@@ -5,17 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.UserCategoriesPrefsInContexts;
-import br.cin.tbookmarks.recommender.database.contextual.AbstractContextualAttribute;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualCriteria;
-import br.cin.tbookmarks.recommender.database.contextual.ContextualPreference;
 import br.cin.tbookmarks.recommender.database.contextual.ContextualUserPreferenceArray;
 import br.cin.tbookmarks.recommender.database.item.ItemCategory;
 

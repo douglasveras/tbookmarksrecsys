@@ -17,12 +17,12 @@ public abstract class AbstractCrossDomainDataset extends AbstractDataset {
 	protected void initializeCrossDomainDataset(){
 
 		try {
-			initializeDataModel();
+			//initializeDataModel();
 			initializeDBInfo();
-		} catch (IOException e) {
+		} /*catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NumberFormatException e) {
+		} */catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

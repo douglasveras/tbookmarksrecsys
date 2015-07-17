@@ -33,7 +33,7 @@ public final class GroupLensDataset extends AbstractDataset {
 	private GroupLensDataset() {
 		try {
 			if(initializeDM){
-				initializeDataModel();	
+			//	initializeDataModel();	
 			}
 			
 			initializeDBInfo();

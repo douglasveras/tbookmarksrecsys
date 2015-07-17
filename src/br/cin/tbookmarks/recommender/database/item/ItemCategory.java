@@ -3,7 +3,7 @@ package br.cin.tbookmarks.recommender.database.item;
 public enum ItemCategory {
 
 	UNKNOWN(0), ACTION_ADVENTURE(1), INTERNATIONAL(2), ANIMATION(3), ANIME(4), BOXED_SETS(5),
-	CLASSICS(6), COMEDY(7), DOCUMENTARY(8), DRAMA(10), EDUCATIONAL(10), HEALTH(11)
+	CLASSICS(6), COMEDY(7), DOCUMENTARY(8), DRAMA(9), EDUCATIONAL(10), HEALTH(11)
 	, RELIGION(12), FANTASY(13), LGBT(14), HOLIDAY_SEASONAL(15), HORROR(16), ARTISTICAL(17), KIDS_FAMILY(18)
 	, WAR(19), MUSICALS(20), MYSTERY(21), ROMANCE(22), SCI_FI(23), SPECIAL(24), SPORTS(25), WESTERNS(26),
 	
@@ -22,9 +22,9 @@ public enum ItemCategory {
 		
 	}
 
-	public int getCode() {
+	/*public int getCode() {
 		return this.code;
-	}
+	}*/
 	
 	/*public ItemDomain getUsualDomain() {
 		return this.usualDomain;

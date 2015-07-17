@@ -1,6 +1,7 @@
 package br.cin.tbookmarks.client;
 
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.List;
 
 import br.cin.tbookmarks.shared.FieldVerifier;
 
@@ -11,17 +12,19 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.view.client.ListDataProvider;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -32,12 +35,16 @@ public class TBookmarksRS implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Greeting
 	 * service.
 	 */
-	private final UserWebResourcesServiceAsync userWebResourcesService = GWT
-			.create(UserWebResourcesService.class);
+	/*private final UserWebResourcesServiceAsync userWebResourcesService = GWT
+			.create(UserWebResourcesService.class);*/
+	
+	private final ResultsEvalServiceAsync resultsEvalService = GWT
+			.create(ResultsEvalService.class);
 
 	/**
 	 * This is the entry point method.
 	 */
+	@Override
 	public void onModuleLoad() {
 		
 		String userAgent = Window.Navigator.getUserAgent().toLowerCase();
@@ -53,10 +60,11 @@ public class TBookmarksRS implements EntryPoint {
 		}/*else if(!userAgent.contains("android") && Window.Location.getPath().contains(androidPage)){
 			Window.open(server, "_self", "");
 		}*/
-		
-		final Button sendButtonTest = new Button("Send");
+
+
+		final Button sendButtonTest = new Button("Execute");
 		final TextBox nameField = new TextBox();
-		nameField.setText("ID");
+		nameField.setText("e.x. 1 (0 for all trials)");
 		final Label errorLabel = new Label();
 
 		// We can add style names to widgets
@@ -70,7 +78,7 @@ public class TBookmarksRS implements EntryPoint {
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 		
 		Label labelFieldMessage = new Label();
-		labelFieldMessage.setText("Please enter the T-Bookmarks ID from TV:");
+		labelFieldMessage.setText("Please enter the trial number:");
 		labelFieldMessage.setStyleName("field-Message");
 		
 		RootPanel.get("fieldMessage").add(labelFieldMessage);
@@ -89,6 +97,7 @@ public class TBookmarksRS implements EntryPoint {
 			/**
 			 * Fired when the user clicks on the sendButton.
 			 */
+			@Override
 			public void onClick(ClickEvent event) {
 				sendNameToServer();
 			}
@@ -96,6 +105,7 @@ public class TBookmarksRS implements EntryPoint {
 			/**
 			 * Fired when the user types in the nameField.
 			 */
+			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 					sendNameToServer();
@@ -120,57 +130,94 @@ public class TBookmarksRS implements EntryPoint {
 				textToServerLabel.setText(textToServer);
 				serverResponseLabel.setText("");
 
-				RootPanel.get("resultsCurrent").clear();
-				RootPanel.get("resultsHistory").clear();
+				RootPanel.get("resultsEval").clear();
+				//RootPanel.get("resultsHistory").clear();
 				
 				
 				try {
-					userWebResourcesService.getUserWebResources(textToServer,
-							new AsyncCallback<HashMap<String,String>>() {
+					resultsEvalService.getResultsEval(textToServer,
+							new AsyncCallback<List<Result>>() {
+								@Override
 								public void onFailure(Throwable caught) {
 									Window.alert(caught.getMessage());
 									
 								}
 
-								public void onSuccess(HashMap<String,String> results) {
-									Tree currentResultsTree = createTreeToRecommendationType(results,EnumRecommendationType.CURRENT);
-									addResultPanelWithTree(currentResultsTree,"Current Recommendation","resultsCurrent", "results-panel-current");
+								@Override
+								public void onSuccess(List<Result> results) {
+									CellTable<Result> currentResultsTree = createTableToResultsEval(results);
+									addResultPanelWithTable(currentResultsTree,"Results Eval","resultsEval", "results-panel-eval");
 									
-									Tree historyResultsTree = createTreeToRecommendationType(results,EnumRecommendationType.HISTORY);
-									addResultPanelWithTree(historyResultsTree,"History Recommendation","resultsHistory", "results-panel-history");
+//									Tree historyResultsTree = createTreeToRecommendationType(results,EnumRecommendationType.HISTORY);
+//									addResultPanelWithTree(historyResultsTree,"History Recommendation","resultsHistory", "results-panel-history");
 								}
 								
-								private Tree createTreeToRecommendationType(
-										HashMap<String,String> response, EnumRecommendationType recommendationType) {
-									Tree resultsTree = new Tree();
-									
-									
-									for(EnumCategoryType categoryType : EnumCategoryType.values()){
-										TreeItem categoryItem = new TreeItem();
-										categoryItem.setText(categoryType.toString());
+								private  CellTable<Result> createTableToResultsEval(List<Result> response) {
+									// Create a CellTable.
+								    CellTable<Result> table = new CellTable<Result>();
+
+								   
+								    TextColumn<Result> trialColumn = new TextColumn<Result>() {
+								      @Override
+								      public String getValue(Result result) {
+								        return String.valueOf(result.getTrial());
+								      }
+								    };
+
+								    // Make the trial column sortable.
+								    trialColumn.setSortable(true);
+								   
+								    TextColumn<Result> contextColumn = new TextColumn<Result>() {
+								      @Override
+								      public String getValue(Result result) {
+								        return result.getContext();
+								      }
+								    };
+
+								    // Add the columns.
+								    table.addColumn(trialColumn, "Trial");
+								    table.addColumn(contextColumn, "Context");
+
+								    // Create a data provider.
+								    ListDataProvider<Result> dataProvider = new ListDataProvider<Result>();
+
+								    // Connect the table to the data provider.
+								    dataProvider.addDataDisplay(table);
+
+								    // Add the data to the data provider, which automatically pushes it to the
+								    // widget.
+								    List<Result> list = dataProvider.getList();
+								    for (Result r : response) {
+								      list.add(r);
+								    }
+
+								    // Add a ColumnSortEvent.ListHandler to connect sorting to the
+								    // java.util.List.
+								    ListHandler<Result> columnSortHandler = new ListHandler<Result>(
+								        list);
+								    columnSortHandler.setComparator(trialColumn, new Comparator<Result>() {
 										
-										if (response.get("results"+recommendationType+categoryType) != null) {
-											
-											resultsTree.addItem(categoryItem);
-											
-											String urls = response.get("results"+recommendationType+categoryType);
-											
-											String[] results = urls.split(";");
-										
-											for (int i = 0; i < results.length; i++) {
-												
-												Anchor anchor = new Anchor(results[i]);
-												anchor.setHref(results[i]);
-												anchor.setStyleName("results-anchor");
-												
-												categoryItem.addItem(anchor);
-												//categoryItem.setHeight("100px");
-												
-											}
-											
-										}
-									}
-									return resultsTree;
+										@Override
+										public int compare(Result o1, Result o2) {
+								            if (o1 == o2) {
+								              return 0;
+								            }
+
+								            // Compare the trial columns.
+								            if (o1 != null) {
+								              return (o2 != null) ? String.valueOf(o1.getTrial()).compareTo(String.valueOf(o2.getTrial())) : 1;
+								            }
+								            return -1;
+								          }
+									});
+								    table.addColumnSortHandler(columnSortHandler);
+
+								    // We know that the data is sorted alphabetically by default.
+								    table.getColumnSortList().push(trialColumn);
+
+								    // Add it to the root panel.
+								    return table;
+									
 								}
 							});
 				} catch (Exception e) {
@@ -185,13 +232,35 @@ public class TBookmarksRS implements EntryPoint {
 		MyHandler handler = new MyHandler();
 		sendButtonTest.addClickHandler(handler);
 		nameField.addKeyUpHandler(handler);
+	
 	}
 
-	private void addResultPanelWithTree(Tree t, String resultsName, String htmlElementId, String style) {
+/*	private void addResultPanelWithTree(Tree t, String resultsName, String htmlElementId, String style) {
 		HorizontalPanel horizontalPanelCurrentResults = new HorizontalPanel();
 		horizontalPanelCurrentResults.setBorderWidth(1);
 		horizontalPanelCurrentResults.addStyleName("results-panel");
 		horizontalPanelCurrentResults.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
+
+		horizontalPanelCurrentResults.add(t);
+		
+		final Label labelCurrentResults = new Label();
+		labelCurrentResults.setText(resultsName);
+		labelCurrentResults.addStyleName("results-label");
+		
+		RootPanel.get(htmlElementId).clear();
+		
+		RootPanel.get(htmlElementId).add(labelCurrentResults);
+		
+		RootPanel.get(htmlElementId).add(horizontalPanelCurrentResults);
+		
+		RootPanel.get(htmlElementId).addStyleName(style);
+	}*/
+	
+	private void addResultPanelWithTable(CellTable<Result> t, String resultsName, String htmlElementId, String style) {
+		HorizontalPanel horizontalPanelCurrentResults = new HorizontalPanel();
+		horizontalPanelCurrentResults.setBorderWidth(1);
+		horizontalPanelCurrentResults.addStyleName("results-panel");
+		horizontalPanelCurrentResults.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 
 		horizontalPanelCurrentResults.add(t);
 		

@@ -1,6 +1,5 @@
 package br.cin.tbookmarks.recommender.similarity;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -9,11 +8,8 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 
-import com.google.common.primitives.Longs;
-
 import br.cin.tbookmarks.recommender.database.AbstractDataset;
 import br.cin.tbookmarks.recommender.database.item.ItemCategory;
-import br.cin.tbookmarks.recommender.database.item.ItemInformation;
 
 public class ItemCategoryItemSimilarity implements ItemSimilarity {
 

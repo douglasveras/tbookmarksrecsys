@@ -1,6 +1,5 @@
 package br.cin.tbookmarks.recommender.similarity;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.apache.mahout.cf.taste.recommender.IDRescorer;

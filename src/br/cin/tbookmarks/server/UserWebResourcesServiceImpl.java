@@ -19,6 +19,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class UserWebResourcesServiceImpl extends RemoteServiceServlet implements
 		UserWebResourcesService {
 
+	@Override
 	public HashMap<String,String> getUserWebResources(String userId) throws Exception {
 
 		HashMap<String,String> response = new HashMap<String, String>();

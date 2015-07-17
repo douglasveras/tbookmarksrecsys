@@ -1,31 +1,16 @@
 package br.cin.tbookmarks.recommender;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.apache.mahout.cf.taste.common.Refreshable;
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.common.FastIDSet;
-import org.apache.mahout.cf.taste.impl.common.RefreshHelper;
-import org.apache.mahout.cf.taste.impl.recommender.AbstractRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.EstimatedPreferenceCapper;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.TopItems;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.recommender.Rescorer;
-import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
-import org.apache.mahout.common.LongPair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 /**
  * <p>
@@ -77,7 +62,7 @@ public class GenericUserBasedRecommenderWithRescorer implements Recommender {
 			throws TasteException {
 		
 		if(this.idrescorer == null){
-			return (float) delegate.estimatePreference(userID, itemID);
+			return delegate.estimatePreference(userID, itemID);
 		}else{
 			return (float) this.idrescorer.rescore(itemID, delegate.estimatePreference(userID, itemID));
 		}

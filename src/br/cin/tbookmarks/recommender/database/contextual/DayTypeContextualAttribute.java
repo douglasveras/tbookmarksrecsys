@@ -10,6 +10,7 @@ public enum DayTypeContextualAttribute implements AbstractContextualAttribute{
 		this.code = value;
 	}
 
+	@Override
 	public long getCode() {
 		return this.code;
 	}
