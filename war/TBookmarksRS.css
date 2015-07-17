@@ -41,6 +41,12 @@ h1 {
    width: 500px;
 }
 
+.results-panel-eval {
+   float: left;
+   margin-left: 10%;
+   width: 100%;
+}
+
 .results-panel-history {
   margin-left: 15px;
   float: left;

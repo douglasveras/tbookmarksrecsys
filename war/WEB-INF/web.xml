@@ -23,6 +23,16 @@
 		<servlet-name>userWebResource</servlet-name>
 		<url-pattern>/tbookmarksrs/userWebResource</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>resultsEvalService</servlet-name>
+		<servlet-class>br.cin.tbookmarks.server.ResultsEvalServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>resultsEvalService</servlet-name>
+		<url-pattern>/tbookmarksrs/resultsEvalService</url-pattern>
+	</servlet-mapping>
 
 	<!-- Default page to serve -->
 	<welcome-file-list>
